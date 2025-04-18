@@ -1,6 +1,9 @@
-package com.example.backend.repository;
-
-import com.example.backend.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<User, Long> {}
+import com.example.backend.model.User;
+import com.sun.tools.javac.util.List;
+import com.example.backend.model.Association;
+
+public interface UserRepository extends JpaRepository<User, Long> {
+  List<User> findByAssociation(Association association);
+}
