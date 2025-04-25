@@ -14,4 +14,13 @@ public class User {
   @ManyToOne
   @JoinColumn(name = "association_id")
   private Association association;
+
+  public Association getAssociation() {
+    return association;
+  }
+
+  public void setAssociation(Association association) {
+    this.association = association;
+  }
+
 }

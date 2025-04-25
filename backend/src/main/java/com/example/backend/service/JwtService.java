@@ -1,36 +1,35 @@
-package com.yourproject.service;
+package com.example.backend.service;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.JwtException;
 import org.springframework.stereotype.Service;
-
-import com.sun.org.apache.xml.internal.security.algorithms.SignatureAlgorithm;
 
 import java.util.Date;
 
 @Service
 public class JwtService {
-  private final String SECRET = "mySecretKey";
-  private final long EXPIRATION_TIME = 86400000; // 1 day
 
-  public String generateToken(String email) {
+  private static final String SECRET = "very_secret_key"; // Replace with env variable in production
+  private static final long EXPIRATION_TIME = 86400000; // 1 day in milliseconds
+
+  public String generateToken(String subject) {
     return Jwts.builder()
-        .setSubject(email)
-        .setIssuedAt(new Date())
+        .setSubject(subject)
         .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
         .signWith(SignatureAlgorithm.HS256, SECRET)
         .compact();
   }
 
-  public String extractSubject(String token) {
-    return Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody().getSubject();
+  public String validateTokenAndGetSubject(String token) throws JwtException {
+    return Jwts.parser()
+        .setSigningKey(SECRET)
+        .parseClaimsJws(token)
+        .getBody()
+        .getSubject();
   }
 
-  public boolean validateToken(String token) {
-    try {
-      Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token);
-      return true;
-    } catch (JwtException e) {
-      return false;
-    }
+  public String extractSubject(String token) {
+    return Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody().getSubject();
   }
 }
