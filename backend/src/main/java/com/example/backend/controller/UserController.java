@@ -37,6 +37,8 @@ public class UserController {
   @GetMapping
   public List<User> getUsers(@RequestHeader("Authorization") String authHeader) {
     String token = authHeader.replace("Bearer ", "");
+
+    System.out.println("got mapping, token is " + token);
     Association association = getAssociationFromToken(token);
     return userRepository.findByAssociation(association);
   }
