@@ -50,9 +50,13 @@ public class AuthController {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already registered");
     }
 
+    System.out.println("user registered with credentials: " + email + ", " + password);
+
     Association newAssociation = new Association();
     newAssociation.setEmail(email);
-    newAssociation.setPassword(password); // You should hash this in prod
+
+    // TODO: hash this in prod
+    newAssociation.setPassword(password);
 
     associationRepository.save(newAssociation);
 
