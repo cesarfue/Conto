@@ -12,4 +12,8 @@ export class AuthService {
   register(email: string, password: string) {
     return this.http.post('/api/register', { email, password });
   }
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
 }
