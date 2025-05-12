@@ -1,36 +1,29 @@
-all:
-	@docker compose -f docker-compose.yml up -d --build
+all: dev
 
-# # Démarrage du projet en mode production
-# prod:
-#         @docker compose -f docker-compose.prod.yml up -d --build
-#
-# Arrêter les conteneurs
+dev:
+	@docker compose docker-compose.override.yml up -d --build
+
+prod:
+	@docker compose up -d --build
+
 down:
 	@docker compose down
 
-# Arrêter uniquement les conteneurs en cours d'exécution
 stop:
 	@docker compose stop
 
-# Redémarrer les conteneurs sans rebuild
 start:
 	@docker compose start
 
-# Voir les conteneurs en cours d'exécution
 status:
 	@docker ps
 
-# Nettoyer les conteneurs, images et volumes (supprime TOUT sauf les volumes persistants)
 clean:
-	@docker compose down
-	@docker system prune -a -f
-	@docker buildx prune -af
+	@docker compose down --volumes --remove-orphans
 
 clean-volumes:
 	@docker volume rm $$(docker volume ls -q)
 
-# Supprimer et relancer les conteneurs (équivalent à clean + up)
 re:
 	@$(MAKE) clean
-	@$(MAKE) all
+	@$(MAKE) dev

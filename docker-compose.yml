@@ -17,13 +17,6 @@ services:
   backend:
     build: ./backend
     container_name: backend
-    volumes:
-      - ./backend/src:/app/src
-      - ./backend/build.gradle:/app/build.gradle
-      - ./backend/settings.gradle:/app/settings.gradle
-      - ./backend/gradle:/app/gradle
-      - ./backend/gradlew:/app/gradlew
-      - ./backend/gradlew.bat:/app/gradlew.bat
     ports:
       - "8080:8080"
     depends_on:
@@ -32,19 +25,18 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/mydb
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: pass
-      SPRING_DEVTOOLS_RESTART_ENABLED: true
     networks:
       - app-network
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      target: prod
     container_name: frontend
     ports:
-      - "3000:3000"
+      - "3000:80"
     depends_on:
       - backend
-    environment:
-      NEXT_PUBLIC_BACKEND_URL: http://localhost:8080
     networks:
       - app-network
 
