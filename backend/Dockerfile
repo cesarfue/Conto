@@ -7,8 +7,10 @@ COPY gradlew build.gradle settings.gradle ./
 
 COPY gradle ./gradle
 
-COPY src ./src
+RUN chmod +x ./gradlew
 
-RUN ./gradlew build -x test --no-daemon
+RUN ./gradlew --no-daemon dependencies
 
-CMD ["./gradlew", "bootRun"]
+EXPOSE 8080
+
+CMD ["./gradlew", "bootRun", "--no-daemon"]

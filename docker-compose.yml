@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   mysql:
     image: mysql:8
@@ -25,6 +23,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/mydb
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: pass
+      SPRING_PROFILES_ACTIVE: dev
+    volumes:
+      - ./backend:/app
+      - ~/./gradle:/root/.gradle
     networks:
       - app-network
 
@@ -34,7 +36,7 @@ services:
       target: prod
     container_name: frontend
     ports:
-      - "3000:80"
+      - "4200:4200"
     depends_on:
       - backend
     networks:

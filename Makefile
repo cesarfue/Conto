@@ -1,7 +1,7 @@
 all: dev
 
 dev:
-	@docker compose docker-compose.override.yml up -d --build
+	@docker compose -f docker-compose.yml -f docker-compose.override.yml up -d --build
 
 prod:
 	@docker compose up -d --build

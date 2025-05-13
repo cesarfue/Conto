@@ -1,11 +1,27 @@
 <div class="auth-container">
-  <div class="auth-section">
-    <h2>Login</h2>
-    <app-login></app-login>
-  </div>
+  <div class="auth-card">
+    <h1>
+      @if (isLoginMode) {
+        Log In
+      } @else {
+        Sign Up
+      }
+    </h1>
 
-  <div class="auth-section">
-    <h2>Register</h2>
-    <app-register></app-register>
+    @if (isLoginMode) {
+      <p class="toggle-text">
+        New to YNAB? <a (click)="toggleMode()">Sign up today.</a>
+      </p>
+    } @else {
+      <p class="toggle-text">
+        Already have an account? <a (click)="toggleMode()">Log in.</a>
+      </p>
+    }
+
+    @if (isLoginMode) {
+      <app-login></app-login>
+    } @else {
+      <app-register></app-register>
+    }
   </div>
 </div>

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -11,6 +11,8 @@ import { FormsModule } from '@angular/forms';
 export class LoginComponent {
   email = '';
   password = '';
+  showPassword: boolean = false;
+  keepLoggedIn: boolean = false;
 
   constructor(private auth: AuthService) {}
 

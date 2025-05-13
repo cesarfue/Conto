@@ -6,11 +6,11 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(email: string, password: string) {
-    return this.http.post('/api/login', { email, password });
+    return this.http.post('/api/auth/login', { email, password });
   }
 
   register(email: string, password: string) {
-    return this.http.post('/api/register', { email, password });
+    return this.http.post('/api/auth/register', { email, password });
   }
 
   isLoggedIn(): boolean {
