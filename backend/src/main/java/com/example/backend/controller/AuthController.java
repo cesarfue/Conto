@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.backend.model.Association;
 import com.example.backend.repository.AssociationRepository;
+import com.example.backend.service.GoogleAuthService;
 import com.example.backend.service.JwtService;
 
 import java.util.Map;
@@ -23,6 +24,8 @@ public class AuthController {
   private AssociationRepository associationRepository;
   @Autowired
   private JwtService jwtService;
+  @Autowired
+  private GoogleAuthService googleAuthService;
 
   @PostMapping("/login")
   public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
@@ -63,4 +66,21 @@ public class AuthController {
     String token = jwtService.generateToken(email);
     return ResponseEntity.ok(Map.of("token", token));
   }
+
+  @PostMapping("/google")
+  public ResponseEntity<?> googleAuth(@RequestBody Map<String, String> request) {
+    System.out.println("got post request from frontend");
+    String token = request.get("token");
+
+    if (token == null || token.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Google token is required");
+    }
+
+    String jwtToken = googleAuthService.authenticateGoogleToken(token);
+
+    return ResponseEntity.ok(Map.of(
+        "token", jwtToken,
+        "message", "Successfully authenticated with Google"));
+  }
+
 }

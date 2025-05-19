@@ -15,39 +15,47 @@ export class GoogleAuthService {
   private isInitialized = new BehaviorSubject<boolean>(false);
   isInitialized$ = this.isInitialized.asObservable();
 
-  // Your client ID from Google Cloud Console
   private clientId =
     '1068314139716-ooc63lc2fufv5sjpak0nqcmfu3r2nvol.apps.googleusercontent.com';
   initialize() {
-    // Initialize Google Identity Services
-    google.accounts.id.initialize({
-      client_id: this.clientId,
-      callback: this.handleCredentialResponse.bind(this),
-      auto_select: false,
-      cancel_on_tap_outside: true,
-    });
-    this.isInitialized.next(true);
+    console.log('Initializing Google Auth with client ID:', this.clientId);
+
+    try {
+      google.accounts.id.initialize({
+        client_id: this.clientId,
+        callback: this.handleCredentialResponse.bind(this),
+        auto_select: false,
+        cancel_on_tap_outside: true,
+      });
+      console.log('Google Auth initialized successfully');
+      this.isInitialized.next(true);
+    } catch (error) {
+      console.error('Error initializing Google Auth:', error);
+    }
   }
 
   private handleCredentialResponse(response: any) {
-    // Send the token to your backend for verification and login
+    console.log('handleCredentialResponse()');
+
     this.http
-      .post('/api/auth/google', {
-        token: response.credential,
-      })
+      .post<{ token: string; message?: string }>(
+        'http://localhost:8080/api/auth/google',
+        {
+          token: response.credential,
+        },
+      )
       .subscribe({
-        next: (authResult: any) => {
-          // Use the login method from your existing auth service
-          // Assuming your login method accepts token or credentials
-          this.authService
-            .login(authResult.email, authResult.token)
-            .subscribe(() => {
-              // Handle successful login - you may need to adjust this based on your service
-              console.log('Successfully logged in with Google');
-            });
+        next: (authResult) => {
+          // With proper typing, TypeScript knows authResult has a token property
+          console.log('Backend auth response:', authResult);
+          localStorage.setItem('token', authResult.token);
+
+          // Navigate to protected page or update UI
+          window.location.href = '/dashboard'; // Or use Angular Router
         },
         error: (error) => {
           console.error('Google authentication error:', error);
+          alert('Failed to authenticate with Google. Please try again.');
         },
       });
   }
@@ -58,7 +66,7 @@ export class GoogleAuthService {
       google.accounts.id.renderButton(document.getElementById(elementId), {
         theme: 'outline',
         size: 'large',
-        width: '100%',
+        width: '300',
       });
     }
   }
