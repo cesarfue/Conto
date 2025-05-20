@@ -14,6 +14,8 @@ import com.example.backend.repository.AssociationRepository;
 import com.example.backend.service.GoogleAuthService;
 import com.example.backend.service.JwtService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.Map;
 
 @RestController
@@ -72,6 +74,8 @@ public class AuthController {
     System.out.println("got post request from frontend");
     String token = request.get("token");
 
+    System.out.println("user registered with google");
+
     if (token == null || token.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Google token is required");
     }
@@ -83,4 +87,22 @@ public class AuthController {
         "message", "Successfully authenticated with Google"));
   }
 
+  @PostMapping("/logout")
+  public ResponseEntity<?> logout(HttpServletRequest request) {
+    // Get the Authorization header
+    String authHeader = request.getHeader("Authorization");
+
+    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+      // Extract token
+      String token = authHeader.substring(7);
+
+      // You could add the token to a blacklist or perform other invalidation
+      // This depends on your JWT implementation
+
+      // For example, if using a token store:
+      // tokenStore.revokeToken(token);
+    }
+
+    return ResponseEntity.ok(Map.of("message", "Successfully logged out"));
+  }
 }

@@ -6,7 +6,6 @@ import { RegisterComponent } from './register/register.component';
   selector: 'app-auth',
   imports: [LoginComponent, RegisterComponent],
   templateUrl: './auth.component.html',
-  //styleUrl: './auth.component.scss',
 })
 export class AuthComponent {
   isLoginMode: boolean = true;

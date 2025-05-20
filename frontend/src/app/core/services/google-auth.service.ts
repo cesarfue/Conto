@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { catchError, finalize } from 'rxjs/operators';
+import { BehaviorSubject, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { AuthService } from './auth.service';
+import { jwtDecode } from 'jwt-decode';
 
 declare var google: any;
 
@@ -10,16 +11,14 @@ declare var google: any;
 })
 export class GoogleAuthService {
   private http = inject(HttpClient);
-  private authService = inject(AuthService);
 
   private isInitialized = new BehaviorSubject<boolean>(false);
   isInitialized$ = this.isInitialized.asObservable();
 
   private clientId =
     '1068314139716-ooc63lc2fufv5sjpak0nqcmfu3r2nvol.apps.googleusercontent.com';
-  initialize() {
-    console.log('Initializing Google Auth with client ID:', this.clientId);
 
+  initialize() {
     try {
       google.accounts.id.initialize({
         client_id: this.clientId,
@@ -35,8 +34,16 @@ export class GoogleAuthService {
   }
 
   private handleCredentialResponse(response: any) {
-    console.log('handleCredentialResponse()');
-
+    try {
+      const payload = jwtDecode(response.credential);
+      if (payload && (payload as any).picture) {
+        localStorage.setItem('userPicture', (payload as any).picture);
+        localStorage.setItem('userName', (payload as any).name || '');
+        console.log('google elements set to local storage.');
+      }
+    } catch (error) {
+      console.error('Error decoding JWT:', error);
+    }
     this.http
       .post<{ token: string; message?: string }>(
         'http://localhost:8080/api/auth/google',
@@ -46,12 +53,8 @@ export class GoogleAuthService {
       )
       .subscribe({
         next: (authResult) => {
-          // With proper typing, TypeScript knows authResult has a token property
-          console.log('Backend auth response:', authResult);
           localStorage.setItem('token', authResult.token);
-
-          // Navigate to protected page or update UI
-          window.location.href = '/dashboard'; // Or use Angular Router
+          window.location.href = '/dashboard';
         },
         error: (error) => {
           console.error('Google authentication error:', error);
@@ -61,7 +64,6 @@ export class GoogleAuthService {
   }
 
   renderButton(elementId: string) {
-    // Make sure Google Identity Services is initialized
     if (this.isInitialized.value) {
       google.accounts.id.renderButton(document.getElementById(elementId), {
         theme: 'outline',
@@ -75,5 +77,25 @@ export class GoogleAuthService {
     if (this.isInitialized.value) {
       google.accounts.id.prompt();
     }
+  }
+
+  signOut() {
+    if (typeof google !== 'undefined' && google.accounts) {
+      google.accounts.id.disableAutoSelect();
+    }
+
+    localStorage.removeItem('token');
+    localStorage.removeItem('userPicture');
+    localStorage.removeItem('userName');
+
+    return this.http.post('http://localhost:8080/api/auth/logout', {}).pipe(
+      catchError((error) => {
+        console.error('Error during logout:', error);
+        return of(null);
+      }),
+      finalize(() => {
+        window.location.href = '/auth';
+      }),
+    );
   }
 }

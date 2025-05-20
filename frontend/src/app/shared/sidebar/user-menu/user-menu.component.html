@@ -1,0 +1,19 @@
+<div class="user-menu">
+  <button class="user-profile" (click)="toggleUserMenu()">
+    @if (userPicture) {
+      <img class="user-avatar" [src]="userPicture" alt="User profile picture" />
+    } @else {
+      <div class="user-avatar-placeholder">{{ userName.charAt(0) }}</div>
+    }
+    <span>{{ userName }}</span>
+    <i class="dropdown-icon">▼</i>
+  </button>
+
+  @if (isUserMenuOpen) {
+    <div class="user-dropdown">
+      <ul>
+        <li><a (click)="signOut()">Sign Out</a></li>
+      </ul>
+    </div>
+  }
+</div>
