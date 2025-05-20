@@ -1,22 +1,13 @@
+@use 'styles/colors.scss' as colors;
+
 .sidebar {
   width: 30vh;
   height: 100vh;
-  background-color: #1a237e;
+  background-color: colors.$dark;
   color: white;
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-}
-
-.sidebar-header {
-  padding: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
-  h2 {
-    margin: 0;
-    color: white;
-    font-weight: 600;
-  }
 }
 
 .sidebar-menu {

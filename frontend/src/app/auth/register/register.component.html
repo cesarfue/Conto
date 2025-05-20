@@ -1,12 +1,14 @@
-<form (ngSubmit)="onRegister()">
-  <input [(ngModel)]="email" placeholder="Email" name="email" required />
-  <input
-    [(ngModel)]="password"
-    placeholder="Password"
-    name="password"
-    type="password"
-    required
-    autocomplete="current-password"
-  />
-  <button type="submit">Register</button>
-</form>
+<div class="input-group">
+  <form (ngSubmit)="onRegister()">
+    <input [(ngModel)]="email" placeholder="Email" name="email" required />
+    <input
+      [(ngModel)]="password"
+      placeholder="Password"
+      name="password"
+      type="password"
+      required
+      autocomplete="current-password"
+    />
+    <button type="submit">Register</button>
+  </form>
+</div>

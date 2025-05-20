@@ -1,8 +1,7 @@
 <form (ngSubmit)="onLogin()">
   <div class="input-group">
     <div class="icon-container">
-      <i class="email-icon"></i>
-      <!-- Use appropriate icon library -->
+      <i class="fa fa-envelope"></i>
     </div>
     <input
       [(ngModel)]="email"
@@ -14,7 +13,7 @@
 
   <div class="input-group">
     <div class="icon-container">
-      <i class="password-icon"></i>
+      <i class="fa fa-lock"></i>
     </div>
     <input
       [(ngModel)]="password"
@@ -49,9 +48,12 @@
   </div>
 
   <button type="submit" class="primary-button">Log In</button>
+
   <div class="divider">
     <span>or</span>
   </div>
 
-  <div id="google-button-container"></div>
+  <button type="button" class="social-login-button" id="google-signin">
+    <div id="google-button-container">Continue as César</div>
+  </button>
 </form>

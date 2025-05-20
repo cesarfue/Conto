@@ -1,69 +1,170 @@
-.auth-container {
+@use 'styles/colors.scss' as colors;
+
+:host {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f5f5f5;
+  width: 100vw;
+  background-color: colors.$dark;
+  overflow: auto;
 }
 
-.auth-card {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  width: 100%;
-  max-width: 400px;
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
-.toggle-text {
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 14px;
-}
-
-.toggle-text a {
-  color: #4f65fe;
-  cursor: pointer;
-}
-
-.input-group {
-  position: relative;
-  margin-bottom: 15px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+.auth-container {
+  width: 400px;
+  max-width: 90%;
+  padding: 32px;
+  background-color: colors.$light;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   display: flex;
+  flex-direction: column;
   align-items: center;
+  text-align: center;
 }
 
-.icon-container {
-  padding: 0 15px;
-  color: #666;
-}
+:host ::ng-deep {
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #333;
+    font-weight: bold;
+  }
 
-input {
-  padding: 12px;
-  border: none;
-  width: 100%;
-  outline: none;
-  font-size: 16px;
-}
+  .signup-text {
+    margin-bottom: 24px;
+    color: #555;
+    font-size: 1rem;
 
-.primary-button {
-  width: 100%;
-  padding: 12px;
-  background-color: #5a6eff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-top: 15px;
-}
+    a {
+      color: #6366f1;
+      /* Purple link color */
+      text-decoration: none;
+      font-weight: 500;
+    }
+  }
 
-/* And so on for other elements */
+  .input-group {
+    position: relative;
+    width: 100%;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      padding-left: 45px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+
+      &:focus {
+        border-color: #6366f1;
+      }
+    }
+
+    .icon-container {
+      position: absolute;
+      left: 15px;
+      color: #777;
+    }
+
+    .show-password {
+      position: absolute;
+      right: 15px;
+      display: flex;
+      align-items: center;
+
+      label {
+        margin-left: 4px;
+        color: #555;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .form-options {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 24px;
+    align-items: center;
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+
+      label {
+        margin-left: 4px;
+        color: #333;
+        cursor: pointer;
+      }
+    }
+
+    .forgot-password {
+      color: #6366f1;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  }
+
+  .primary-button {
+    width: 100%;
+    padding: 14px;
+    background-color: #6366f1;
+    color: colors.$light;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-bottom: 20px;
+
+    &:hover {
+      background-color: colors.$light;
+    }
+  }
+
+  .divider {
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid #e0e0e0;
+    line-height: 0.1em;
+    margin: 20px 0 24px;
+
+    span {
+      background: colors.$light;
+      padding: 0 10px;
+      color: #777;
+    }
+  }
+
+  .social-login-button {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: colors.$light;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-weight: 500;
+
+    img {
+      margin-right: 10px;
+      height: 20px;
+      width: 20px;
+    }
+
+  }
+
+  #google-button-container {
+    width: 100%;
+  }
+}

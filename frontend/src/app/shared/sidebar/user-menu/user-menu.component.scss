@@ -12,6 +12,7 @@
   cursor: pointer;
   border-radius: 20px;
   transition: background-color 0.2s;
+  color: white;
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.05);
@@ -45,13 +46,13 @@
 
 .user-name {
   font-weight: 500;
-  color: #333;
+  color: white;
 }
 
 .user-dropdown {
   position: absolute;
   left: 0; // Position dropdown to the left
-  top: calc(100% + 5px); // Add a small gap
+  bottom: calc(100% + 5px); // Add a small gap
   width: 220px;
   background-color: white;
   border-radius: 8px;
@@ -99,7 +100,7 @@
 
         .user-email {
           font-size: 14px;
-          color: #666;
+          color: white;
         }
       }
     }
@@ -151,6 +152,7 @@
 }
 
 .dropdown-icon {
+  transform: rotate(180deg);
   margin-left: 8px;
   font-size: 10px;
   opacity: 0.7;
