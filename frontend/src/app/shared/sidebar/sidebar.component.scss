@@ -1,7 +1,7 @@
 @use 'styles/colors.scss' as colors;
 
 .sidebar {
-  width: 30vh;
+  width: 23vh;
   height: 100vh;
   background-color: colors.$dark;
   color: white;
@@ -48,4 +48,10 @@
 .sidebar-footer {
   padding: 15px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
 }

@@ -1,0 +1,45 @@
+<div
+  class="transaction-item"
+  [ngClass]="{
+    'transaction-positive': transaction.amount > 0,
+    'transaction-negative': transaction.amount < 0,
+  }"
+>
+  <div class="transaction-icon">
+    <i class="fa" [ngClass]="getCategoryIcon(transaction.category)"></i>
+  </div>
+
+  <div class="transaction-details">
+    <div class="transaction-header">
+      <span class="transaction-title">{{ transaction.title }}</span>
+      <span class="transaction-date">{{
+        transaction.date | date: "MMM d, y"
+      }}</span>
+    </div>
+
+    <div class="transaction-subheader">
+      <span class="transaction-category">{{ transaction.category }}</span>
+      @if (transaction.recipient) {
+        <span class="transaction-recipient"
+          >To: {{ transaction.recipient }}</span
+        >
+      }
+    </div>
+
+    @if (transaction.description) {
+      <p class="transaction-description">
+        {{ transaction.description }}
+      </p>
+    }
+  </div>
+
+  <div
+    class="transaction-amount"
+    [ngClass]="{
+      'amount-positive': transaction.amount > 0,
+      'amount-negative': transaction.amount < 0,
+    }"
+  >
+    {{ transaction.amount > 0 ? "+" : "" }}{{ transaction.amount | currency }}
+  </div>
+</div>
