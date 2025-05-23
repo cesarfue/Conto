@@ -2,7 +2,6 @@
   <h3 class="form-title">Add New Transaction</h3>
 
   <form (ngSubmit)="onSubmit()">
-    <!-- Title field -->
     <div class="form-group">
       <label for="title">Title</label>
       <input
@@ -14,7 +13,6 @@
       />
     </div>
 
-    <!-- Amount field -->
     <div class="form-group">
       <label for="amount">Amount</label>
       <input
@@ -26,20 +24,18 @@
       />
     </div>
 
-    <!-- Category field -->
     <div class="form-group">
-      <label for="category">Category</label>
       <select
         id="category"
         name="category"
         [(ngModel)]="newTransaction.category"
         required
       >
-        <option value="income">Income</option>
-        <option value="groceries">Groceries</option>
-        <option value="utilities">Utilities</option>
-        <option value="entertainment">Entertainment</option>
-        <!-- Add more options as needed -->
+        @for (category of categories; track category) {
+          <option [value]="category.name">
+            {{ category.name | titlecase }}
+          </option>
+        }
       </select>
     </div>
 

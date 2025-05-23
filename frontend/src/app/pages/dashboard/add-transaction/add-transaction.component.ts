@@ -1,30 +1,26 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  Validators,
+} from '@angular/forms';
 import { TransactionService } from '../../../core/services/transaction.service';
 import { CommonModule } from '@angular/common';
+import { TransactionComponent } from '../transaction/transaction.component';
 
 @Component({
   selector: 'app-add-transaction',
-  imports: [CommonModule],
   templateUrl: './add-transaction.component.html',
   styleUrl: './add-transaction.component.scss',
+  imports: [FormsModule, CommonModule],
 })
 export class AddTransactionComponent {
+  get categories() {
+    return TransactionComponent.categories;
+  }
+
   transactionForm: FormGroup;
-  categories = [
-    'food',
-    'groceries',
-    'shopping',
-    'transportation',
-    'housing',
-    'utilites',
-    'income',
-    'entertainment',
-    'health',
-    'education',
-    'travel',
-    'other',
-  ];
 
   newTransaction = {
     title: '',

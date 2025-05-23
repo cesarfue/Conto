@@ -20,22 +20,20 @@ export interface Transaction {
 export class TransactionComponent {
   @Input() transaction!: Transaction;
 
-  getCategoryIcon(category: string): string {
-    const iconMap: { [key: string]: string } = {
-      food: 'fa-utensils',
-      groceries: 'fa-shopping-basket',
-      shopping: 'fa-shopping-bag',
-      transportation: 'fa-car',
-      housing: 'fa-home',
-      utilities: 'fa-bolt',
-      income: 'fa-wallet',
-      entertainment: 'fa-film',
-      health: 'fa-heartbeat',
-      education: 'fa-graduation-cap',
-      travel: 'fa-plane',
-      other: 'fa-receipt',
-    };
+  static categories = [
+    { name: 'income', icon: 'fa-wallet' },
+    { name: 'groceries', icon: 'fa-shopping-basket' },
+    { name: 'utilities', icon: 'fa-bolt' },
+    { name: 'entertainment', icon: 'fa-film' },
+    { name: 'food', icon: 'fa-utensils' },
+    { name: 'transportation', icon: 'fa-car' },
+    { name: 'housing', icon: 'fa-home' },
+  ];
 
-    return iconMap[category.toLowerCase()] || 'fa-receipt';
+  getCategoryIcon(category: string): string {
+    const found = TransactionComponent.categories.find(
+      (cat) => cat.name === category,
+    );
+    return found?.icon || 'fa-receipt';
   }
 }
