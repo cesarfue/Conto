@@ -10,25 +10,15 @@
   </div>
 
   <div class="transaction-details">
-    <div class="transaction-header">
-      <span class="transaction-title">{{ transaction.title }}</span>
-      <span class="transaction-date">{{
-        transaction.date | date: "MMM d, y"
-      }}</span>
-    </div>
-
-    <div class="transaction-subheader">
-      <span class="transaction-category">{{ transaction.category }}</span>
-      @if (transaction.recipient) {
-        <span class="transaction-recipient"
-          >To: {{ transaction.recipient }}</span
-        >
-      }
-    </div>
-
-    @if (transaction.description) {
-      <p class="transaction-description">
-        {{ transaction.description }}
+    <span class="transaction-date">{{
+      transaction.date | date: "MMM d, y"
+    }}</span>
+    <span class="transaction-amount">{{ transaction.amount }}</span>
+    <span class="transaction-category">{{ transaction.category }}</span>
+    <span class="transaction-recipient">To: {{ transaction.recipient }}</span>
+    @if (transaction.memo) {
+      <p class="transaction-memo">
+        {{ transaction.memo }}
       </p>
     }
   </div>
@@ -42,4 +32,13 @@
   >
     {{ transaction.amount > 0 ? "+" : "" }}{{ transaction.amount | currency }}
   </div>
+
+  <button
+    type="button"
+    name="delete-btn"
+    (click)="onDelete()"
+    title="Delete transaction"
+  >
+    <i class="fas fa-trash"></i>
+  </button>
 </div>

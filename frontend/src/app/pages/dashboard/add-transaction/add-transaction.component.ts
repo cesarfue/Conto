@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
-  FormsModule,
+  ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
 import { TransactionService } from '../../../core/services/transaction.service';
@@ -13,7 +13,7 @@ import { TransactionComponent } from '../transaction/transaction.component';
   selector: 'app-add-transaction',
   templateUrl: './add-transaction.component.html',
   styleUrl: './add-transaction.component.scss',
-  imports: [FormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule],
 })
 export class AddTransactionComponent {
   get categories() {
@@ -22,29 +22,36 @@ export class AddTransactionComponent {
 
   transactionForm: FormGroup;
 
-  newTransaction = {
-    title: '',
-    amount: 0,
-    category: '',
-  };
-
   constructor(
     private fb: FormBuilder,
     private transactionService: TransactionService,
   ) {
+    this.transactionForm = this.fb.group({});
+    this.initializeEmptyForm();
+  }
+
+  private initializeEmptyForm(): void {
     this.transactionForm = this.fb.group({
-      title: ['', Validators.required],
+      date: [new Date().toISOString().split('T')[0], Validators.required],
       amount: ['', [Validators.required, Validators.pattern(/^-?\d*\.?\d+$/)]],
       category: ['', Validators.required],
       recipient: [''],
-      description: [''],
+      memo: [''],
     });
   }
 
   onSubmit(): void {
+    console.log('onSubmit()');
     if (this.transactionForm.valid) {
       this.transactionService.addTransaction(this.transactionForm.value);
       this.transactionForm.reset();
+      this.initializeEmptyForm();
+    } else {
+      console.log(
+        'Transaction Form invalid: ',
+        this.transactionForm.status,
+        this.transactionForm.value,
+      );
     }
   }
 }

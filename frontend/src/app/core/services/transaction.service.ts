@@ -26,6 +26,15 @@ export class TransactionService {
     this.saveTransactions();
   }
 
+  deleteTransaction(id: string | number): void {
+    const currentTransactions = this.transactionsSubject.getValue();
+    const updatedTransactions = currentTransactions.filter(
+      (transaction) => transaction.id !== id,
+    );
+    this.transactionsSubject.next(updatedTransactions);
+    this.saveTransactions();
+  }
+
   private loadInitialData(): void {
     const savedTransactions = localStorage.getItem('transactions');
     const initialData = savedTransactions ? JSON.parse(savedTransactions) : [];
@@ -37,6 +46,7 @@ export class TransactionService {
       'transactions',
       JSON.stringify(this.transactionsSubject.getValue()),
     );
+    console.log('saveTransactions()');
   }
 
   private generateId(): string {

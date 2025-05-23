@@ -1,14 +1,14 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TransactionService } from '../../../core/services/transaction.service';
 
 export interface Transaction {
   id: string | number;
-  title: string;
-  amount: number;
   date: Date;
+  amount: number;
   category: string;
-  recipient?: string;
-  description?: string;
+  recipient: string;
+  memo: string;
 }
 
 @Component({
@@ -19,6 +19,8 @@ export interface Transaction {
 })
 export class TransactionComponent {
   @Input() transaction!: Transaction;
+
+  constructor(private transactionService: TransactionService) {}
 
   static categories = [
     { name: 'income', icon: 'fa-wallet' },
@@ -35,5 +37,9 @@ export class TransactionComponent {
       (cat) => cat.name === category,
     );
     return found?.icon || 'fa-receipt';
+  }
+
+  onDelete(): void {
+    this.transactionService.deleteTransaction(this.transaction.id);
   }
 }
