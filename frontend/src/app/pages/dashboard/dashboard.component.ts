@@ -31,9 +31,6 @@ export interface Transaction {
   imports: [CommonModule, ReactiveFormsModule],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  @Output() cancelEdit = new EventEmitter<void>();
-  @Output() saveTransaction = new EventEmitter<any>();
-
   private subscription: Subscription = new Subscription();
 
   transactions: Transaction[] = [];
@@ -49,12 +46,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     { name: 'housing', icon: 'fa-home' },
   ];
   transactionForm: FormGroup;
+  editingTransaction: string | number | null = null;
+  editForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
     private transactionService: TransactionService,
   ) {
     this.transactionForm = this.fb.group({});
+    this.editForm = this.fb.group({});
   }
 
   ngOnInit(): void {
@@ -141,5 +141,36 @@ export class DashboardComponent implements OnInit, OnDestroy {
       outflow: [''],
       inflow: [''],
     });
+  }
+
+  startEdit(transaction: Transaction): void {
+    this.editingTransaction = transaction.id;
+    this.editForm = this.fb.group({
+      date: [transaction.date, Validators.required],
+      category: [transaction.category, Validators.required],
+      memo: [transaction.memo],
+      amount: [Math.abs(transaction.amount)], // Show positive value
+    });
+  }
+
+  saveEdit(): void {
+    if (this.editForm.valid && this.editingTransaction) {
+      const formData = this.editForm.value;
+      const updatedTransaction: Transaction = {
+        id: this.editingTransaction,
+        date: new Date(formData.date),
+        category: formData.category,
+        memo: formData.memo,
+        amount: formData.amount,
+        recipient: '',
+      };
+      this.transactionService.updateTransaction(updatedTransaction);
+      this.cancelEdit();
+    }
+  }
+
+  cancelEdit(): void {
+    this.editingTransaction = null;
+    this.editForm.reset();
   }
 }

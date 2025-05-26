@@ -68,7 +68,16 @@
         [checked]="selectedTransactions.has(transaction.id)"
         (change)="onSelectionChange(transaction.id, $event)"
       />
-      <div class="grid-cell">{{ transaction.date | date: "dd/MM/yyyy" }}</div>
+
+      @if (editingTransaction === transaction.id) {
+        <div [formGroup]="editForm">
+          <input type="date" formControlName="date" class="grid-input" />
+        </div>
+      } @else {
+        <div class="grid-cell" (click)="startEdit(transaction)">
+          {{ transaction.date | date: "dd/MM/yyyy" }}
+        </div>
+      }
       <div class="grid-cell">{{ transaction.category }}</div>
       <div class="grid-cell">{{ transaction.memo }}</div>
       <div class="grid-cell amount-cell">

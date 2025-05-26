@@ -42,6 +42,17 @@ export class TransactionService {
     this.saveTransactions();
   }
 
+  updateTransaction(updatedTransaction: Transaction): void {
+    const currentTransactions = this.transactionsSubject.getValue();
+    const updatedTransactions = currentTransactions.map((transaction) =>
+      transaction.id === updatedTransaction.id
+        ? updatedTransaction
+        : transaction,
+    );
+    this.transactionsSubject.next(updatedTransactions);
+    this.saveTransactions();
+  }
+
   private loadInitialData(): void {
     const savedTransactions = localStorage.getItem('transactions');
     const initialData = savedTransactions ? JSON.parse(savedTransactions) : [];
