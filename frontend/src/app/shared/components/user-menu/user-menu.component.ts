@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { GoogleAuthService } from '../../../core/services/google-auth.service';
+import { GoogleAuthService } from '../../../features/auth/services/google-auth.service';
 
 @Component({
   selector: 'app-user-menu',

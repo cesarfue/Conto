@@ -1,28 +1,15 @@
-import {
-  Output,
-  Component,
-  EventEmitter,
-  OnDestroy,
-  OnInit,
-} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { TransactionService } from '../../core/services/transaction.service';
+import { TransactionService } from '../../services/transaction.service';
 import {
   FormBuilder,
   FormGroup,
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
+import { Transaction } from '../../models/transactions.module';
 
-export interface Transaction {
-  id: string | number;
-  date: Date;
-  amount: number;
-  category: string;
-  recipient: string;
-  memo: string;
-}
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',

@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
-import { GoogleAuthService } from '../../core/services/google-auth.service';
+import { GoogleAuthService } from '../../services/google-auth.service';
 
 @Component({
   selector: 'app-login',

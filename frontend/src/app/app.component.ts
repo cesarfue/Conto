@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from './core/services/auth.service';
-import { SidebarComponent } from './shared/sidebar/sidebar.component';
+import { AuthService } from './features/auth/services/auth.service';
+import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 import { RouterOutlet } from '@angular/router';
 
 @Component({

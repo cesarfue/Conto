@@ -1,4 +1,4 @@
-import { UserMenuComponent } from './user-menu/user-menu.component';
+import { UserMenuComponent } from '../user-menu/user-menu.component';
 import { Component } from '@angular/core';
 
 @Component({
