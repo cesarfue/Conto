@@ -33,21 +33,41 @@
         />
         <input
           type="number"
-          #outflowInput
+          formControlName="outflow"
           placeholder="0.00"
           class="grid-input amount-input"
         />
         <input
           type="number"
-          #inflowInput
+          formControlName="inflow"
           placeholder="0.00"
           class="grid-input amount-input"
         />
       </div>
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="onCancelAdd()">
+          Cancel
+        </button>
+        <button type="button" class="save-btn" (click)="onSaveTransaction()">
+          Save
+        </button>
+        <button
+          type="button"
+          class="save-btn"
+          (click)="onSaveAndAddTransaction()"
+        >
+          Save and add another
+        </button>
+      </div>
     }
 
     @for (transaction of transactions; track transaction.id) {
-      <input type="checkbox" class="transaction-checkbox" />
+      <input
+        type="checkbox"
+        class="transaction-checkbox"
+        [checked]="selectedTransactions.has(transaction.id)"
+        (change)="onSelectionChange(transaction.id, $event)"
+      />
       <div class="grid-cell">{{ transaction.date | date: "dd/MM/yyyy" }}</div>
       <div class="grid-cell">{{ transaction.category }}</div>
       <div class="grid-cell">{{ transaction.memo }}</div>
@@ -63,4 +83,19 @@
       </div>
     }
   </div>
+  @if (selectedTransactions.size >= 1) {
+    <div class="selected-transactions">
+      <span class="selected-count"
+        >{{ selectedTransactions.size }}
+        @if (selectedTransactions.size <= 1) {
+          Transaction
+        } @else {
+          Transactions
+        }
+      </span>
+      <button class="delete-btn" (click)="deleteSelected()">
+        <i class="fa fa-trash"></i>
+      </button>
+    </div>
+  }
 </div>

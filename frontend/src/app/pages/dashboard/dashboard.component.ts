@@ -34,10 +34,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @Output() cancelEdit = new EventEmitter<void>();
   @Output() saveTransaction = new EventEmitter<any>();
 
-  transactions: Transaction[] = [];
-  showAddForm = false;
   private subscription: Subscription = new Subscription();
 
+  transactions: Transaction[] = [];
+  showAddForm = false;
+  selectedTransactions: Set<string | number> = new Set();
   categories = [
     { name: 'income', icon: 'fa-wallet' },
     { name: 'groceries', icon: 'fa-shopping-basket' },
@@ -47,7 +48,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     { name: 'transportation', icon: 'fa-car' },
     { name: 'housing', icon: 'fa-home' },
   ];
-
   transactionForm: FormGroup;
 
   constructor(
@@ -55,7 +55,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private transactionService: TransactionService,
   ) {
     this.transactionForm = this.fb.group({});
-    this.initializeEmptyForm();
   }
 
   ngOnInit(): void {
@@ -71,39 +70,76 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   onAddTransaction(): void {
+    this.initializeEmptyForm();
     this.showAddForm = true;
   }
 
-  onSaveTransaction(transactionData: any): void {
-    this.transactionService.addTransaction(transactionData);
-    this.showAddForm = false;
+  onSaveTransaction(): void {
+    if (this.saveForm()) this.showAddForm = false;
+  }
+
+  onSaveAndAddTransaction(): void {
+    this.saveForm();
+    this.initializeEmptyForm();
+    this.showAddForm = true;
   }
 
   onCancelAdd(): void {
     this.showAddForm = false;
   }
 
-  private initializeEmptyForm(): void {
-    this.transactionForm = this.fb.group({
-      date: [new Date().toISOString().split('T')[0], Validators.required],
-      amount: ['', [Validators.required, Validators.pattern(/^-?\d*\.?\d+$/)]],
-      category: ['', Validators.required],
-      recipient: [''],
-      memo: [''],
-    });
+  onSelectionChange(transactionId: string | number, event: any): void {
+    if (event.target.checked) {
+      this.selectedTransactions.add(transactionId);
+    } else {
+      this.selectedTransactions.delete(transactionId);
+    }
   }
 
-  onSubmit(): void {
+  deleteSelected(): void {
+    if (this.selectedTransactions.size === 0) return;
+    const idsToDelete = Array.from(this.selectedTransactions);
+    this.transactionService.deleteMultipleTransactions(idsToDelete);
+    this.selectedTransactions.clear();
+    console.log(`Deleted ${idsToDelete.length} transactions`);
+  }
+
+  private saveForm(): boolean {
     if (this.transactionForm.valid) {
-      this.transactionService.addTransaction(this.transactionForm.value);
+      const formData = this.transactionForm.value;
+      const outflow = parseFloat(formData.outflow) || 0;
+      const inflow = parseFloat(formData.inflow) || 0;
+      const amount = inflow - outflow;
+
+      const transactionData: Transaction = {
+        date: new Date(formData.date),
+        category: formData.category,
+        memo: formData.memo,
+        amount: amount,
+        id: Date.now().toString(),
+        recipient: '',
+      };
+
+      this.transactionService.addTransaction(transactionData);
       this.transactionForm.reset();
-      this.initializeEmptyForm();
+      return true;
     } else {
       console.log(
         'Transaction Form invalid: ',
         this.transactionForm.status,
         this.transactionForm.value,
       );
+      return false;
     }
+  }
+
+  private initializeEmptyForm(): void {
+    this.transactionForm = this.fb.group({
+      date: [new Date().toISOString().split('T')[0], Validators.required],
+      category: ['', Validators.required],
+      memo: [''],
+      outflow: [''],
+      inflow: [''],
+    });
   }
 }

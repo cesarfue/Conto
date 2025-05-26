@@ -18,8 +18,6 @@ export class TransactionService {
 
     const newTransaction = {
       ...transaction,
-      id: this.generateId(),
-      date: new Date(),
     };
 
     this.transactionsSubject.next([newTransaction, ...currentTransactions]);
@@ -30,6 +28,15 @@ export class TransactionService {
     const currentTransactions = this.transactionsSubject.getValue();
     const updatedTransactions = currentTransactions.filter(
       (transaction) => transaction.id !== id,
+    );
+    this.transactionsSubject.next(updatedTransactions);
+    this.saveTransactions();
+  }
+
+  deleteMultipleTransactions(ids: (string | number)[]): void {
+    const currentTransactions = this.transactionsSubject.getValue();
+    const updatedTransactions = currentTransactions.filter(
+      (transaction) => !ids.includes(transaction.id),
     );
     this.transactionsSubject.next(updatedTransactions);
     this.saveTransactions();
@@ -47,9 +54,5 @@ export class TransactionService {
       JSON.stringify(this.transactionsSubject.getValue()),
     );
     console.log('saveTransactions()');
-  }
-
-  private generateId(): string {
-    return Date.now().toString();
   }
 }

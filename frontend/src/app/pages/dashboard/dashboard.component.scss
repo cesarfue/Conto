@@ -1,3 +1,5 @@
+@use "styles/colors.scss" as colors;
+
 .dashboard-container {
   padding: 25px;
   max-width: 1200px;
@@ -102,10 +104,87 @@
   font-weight: 600;
 }
 
+.form-actions {
+  grid-column: 1 / -1; // Span across all columns
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 8px;
+  background: white;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.save-btn,
+.cancel-btn {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid;
+}
+
+.save-btn {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+
+  &:hover {
+    background: #0056b3;
+  }
+}
+
+.cancel-btn {
+  background: white;
+  color: #666;
+  border-color: #ddd;
+
+  &:hover {
+    background: #f8f9fa;
+  }
+}
+
 .transactions-grid>.transaction-checkbox:hover,
 .transactions-grid>.grid-cell:hover {
   background-color: #f8f9fa;
 }
+
+.selected-transactions {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.selected-count {
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #495057;
+  background: white;
+  border-right: 1px solid #dee2e6;
+}
+
+.delete-btn {
+  padding: 12px 16px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+
+  &:hover {
+    background: #c82333;
+  }
+}
+
 
 @media (min-width: 992px) {
   .dashboard-content {
