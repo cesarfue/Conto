@@ -1,17 +1,66 @@
 <div class="dashboard-container">
-  <header class="dashboard-header">
-    <div class="logo">
-      <h1>**</h1>
-    </div>
-  </header>
-  <body>
-    <div class="transactions-list">
-      @for (transaction of transactions; track transaction.id) {
-        <app-transaction [transaction]="transaction"></app-transaction>
-      } @empty {
-        <div class="no-transactions">No transactions to display</div>
-      }
-    </div>
-    <app-add-transaction></app-add-transaction>
-  </body>
+  <div class="action-bar">
+    <button class="add-transaction-btn" (click)="onAddTransaction()">
+      <i class="fa fa-plus"></i> Add Transaction
+    </button>
+  </div>
+
+  <div class="transactions-grid">
+    <div class="grid-header checkbox-col"></div>
+    <div class="grid-header">DATE</div>
+    <div class="grid-header">CATEGORY</div>
+    <div class="grid-header">MEMO</div>
+    <div class="grid-header">OUTFLOW</div>
+    <div class="grid-header">INFLOW</div>
+
+    @if (showAddForm) {
+      <div class="inline-form-wrapper" [formGroup]="transactionForm">
+        <input type="checkbox" checked class="transaction-checkbox" />
+        <input type="date" formControlName="date" class="grid-input" />
+        <select formControlName="category" class="grid-input">
+          <option value="">Select category</option>
+          @for (category of categories; track category.name) {
+            <option [value]="category.name">
+              {{ category.name | titlecase }}
+            </option>
+          }
+        </select>
+        <input
+          type="text"
+          formControlName="memo"
+          placeholder="memo"
+          class="grid-input"
+        />
+        <input
+          type="number"
+          #outflowInput
+          placeholder="0.00"
+          class="grid-input amount-input"
+        />
+        <input
+          type="number"
+          #inflowInput
+          placeholder="0.00"
+          class="grid-input amount-input"
+        />
+      </div>
+    }
+
+    @for (transaction of transactions; track transaction.id) {
+      <input type="checkbox" class="transaction-checkbox" />
+      <div class="grid-cell">{{ transaction.date | date: "dd/MM/yyyy" }}</div>
+      <div class="grid-cell">{{ transaction.category }}</div>
+      <div class="grid-cell">{{ transaction.memo }}</div>
+      <div class="grid-cell amount-cell">
+        @if (transaction.amount < 0) {
+          {{ -transaction.amount | currency: "EUR" : "symbol" : "1.2-2" }}
+        }
+      </div>
+      <div class="grid-cell amount-cell">
+        @if (transaction.amount > 0) {
+          {{ transaction.amount | currency: "EUR" : "symbol" : "1.2-2" }}
+        }
+      </div>
+    }
+  </div>
 </div>

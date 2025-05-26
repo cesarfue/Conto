@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Transaction } from '../../pages/dashboard/transaction/transaction.component';
+import { Transaction } from '../../pages/dashboard/dashboard.component';
 
 @Injectable({
   providedIn: 'root',

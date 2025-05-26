@@ -4,41 +4,107 @@
   margin: 0 auto;
 }
 
-.dashboard-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 24px;
-}
-
-.dashboard-content {
+.transactions-grid {
   display: grid;
-  gap: 24px;
+  grid-template-columns: 40px 120px minmax(100px, 200px) minmax(0, 1fr) 100px 100px;
+  gap: 0;
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.transactions-list {
+.grid-header {
   background-color: #f8f9fa;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
-}
-
-.transactions-title {
-  font-size: 18px;
+  padding: 12px 8px;
   font-weight: 600;
-  color: #333;
-  margin-bottom: 16px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #666;
+  border-bottom: 1px solid #e9ecef;
+  border-right: 1px solid #e9ecef;
 }
 
-.no-transactions {
-  text-align: center;
-  padding: 24px;
-  color: #777;
-  font-style: italic;
-  background-color: #f5f5f5;
-  border-radius: 8px;
+.checkbox-col {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.grid-cell {
+  padding: 12px 8px;
+  border-bottom: 1px solid #f1f3f4;
+  border-right: 1px solid #f1f3f4;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.transaction-checkbox {
+  margin: 12px auto;
+  border-right: 1px solid #f1f3f4;
+  // justify-self: center;
+}
+
+.amount-cell {
+  justify-content: flex-end;
+  font-weight: 600;
+}
+
+.action-bar {
+  margin-bottom: 16px;
+  padding: 12px 0;
+}
+
+.add-transaction-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &:hover {
+    background: #0056b3;
+  }
+
+  i {
+    font-size: 12px;
+  }
+}
+
+.inline-form-wrapper {
+  display: contents; // This makes the wrapper transparent to the grid
+}
+
+.grid-input {
+  padding: 12px 8px;
+  border: none;
+  border-bottom: 1px solid #f1f3f4;
+  border-right: 1px solid #f1f3f4;
+  background: white;
+  font-size: 14px;
+  outline: none;
+
+  &:focus {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #007bff;
+  }
+}
+
+
+.amount-input {
+  text-align: right;
+  font-weight: 600;
+}
+
+.transactions-grid>.transaction-checkbox:hover,
+.transactions-grid>.grid-cell:hover {
+  background-color: #f8f9fa;
 }
 
 @media (min-width: 992px) {
