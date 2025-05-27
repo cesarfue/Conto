@@ -66,4 +66,11 @@ export class TransactionService {
     );
     console.log('saveTransactions()');
   }
+
+  getTransaction(id: string | number): Transaction | null {
+    const currentTransactions = this.transactionsSubject.getValue();
+    return (
+      currentTransactions.find((transaction) => transaction.id === id) || null
+    );
+  }
 }

@@ -2,7 +2,6 @@
 
 .dashboard-container {
   padding: 25px;
-  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -84,6 +83,7 @@
 }
 
 .grid-input {
+  width: 100%;
   padding: 12px 8px;
   border: none;
   border-bottom: 1px solid #f1f3f4;

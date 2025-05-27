@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
@@ -33,7 +33,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     { name: 'housing', icon: 'fa-home' },
   ];
   transactionForm: FormGroup;
-  editingTransaction: string | number | null = null;
+  editingTransaction: Transaction | null = null;
   editForm: FormGroup;
 
   constructor(
@@ -131,33 +131,43 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   startEdit(transaction: Transaction): void {
-    this.editingTransaction = transaction.id;
+    console.log('startEdit()');
+    this.editingTransaction = transaction;
     this.editForm = this.fb.group({
-      date: [transaction.date, Validators.required],
+      date: [
+        new Date(transaction.date).toISOString().split('T')[0],
+        Validators.required,
+      ],
       category: [transaction.category, Validators.required],
       memo: [transaction.memo],
-      amount: [Math.abs(transaction.amount)], // Show positive value
+      outflow: [transaction.amount < 0 ? Math.abs(transaction.amount) : ''],
+      inflow: [transaction.amount > 0 ? transaction.amount : ''],
     });
   }
 
   saveEdit(): void {
+    console.log('saveEdit()');
     if (this.editForm.valid && this.editingTransaction) {
       const formData = this.editForm.value;
+      const outflow = parseFloat(formData.outflow) || 0;
+      const inflow = parseFloat(formData.inflow) || 0;
+      const amount = inflow - outflow;
+
       const updatedTransaction: Transaction = {
-        id: this.editingTransaction,
+        ...this.editingTransaction,
         date: new Date(formData.date),
         category: formData.category,
         memo: formData.memo,
-        amount: formData.amount,
-        recipient: '',
+        amount: amount,
       };
       this.transactionService.updateTransaction(updatedTransaction);
-      this.cancelEdit();
     }
-  }
 
-  cancelEdit(): void {
     this.editingTransaction = null;
     this.editForm.reset();
+  }
+
+  log(str: string): void {
+    console.log(str);
   }
 }
