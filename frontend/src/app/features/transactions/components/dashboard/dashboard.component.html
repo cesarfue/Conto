@@ -19,9 +19,9 @@
         <input type="date" formControlName="date" class="grid-input" />
         <select formControlName="category" class="grid-input">
           <option value="">Select category</option>
-          @for (category of categories; track category.name) {
+          @for (category of categories; track category) {
             <option [value]="category.name">
-              {{ category.name | titlecase }}
+              {{ category.name }}
             </option>
           }
         </select>
@@ -88,9 +88,9 @@
             (keydown.enter)="saveEdit()"
           >
             <option value="">Select category</option>
-            @for (category of categories; track category.name) {
+            @for (category of categories; track category) {
               <option [value]="category.name">
-                {{ category.name | titlecase }}
+                {{ category.name }}
               </option>
             }
           </select>
@@ -130,7 +130,7 @@
           {{ transaction.date | date: "dd/MM/yyyy" }}
         </div>
         <div class="grid-cell" (click)="startEdit(transaction)">
-          {{ transaction.category | titlecase }}
+          {{ transaction.category }}
         </div>
         <div class="grid-cell" (click)="startEdit(transaction)">
           {{ transaction.memo }}

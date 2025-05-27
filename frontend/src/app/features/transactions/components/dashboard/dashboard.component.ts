@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
@@ -8,7 +8,7 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { Transaction } from '../../models/transactions.model';
+import { Transaction, CATEGORIES } from '../../models/transactions.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -23,18 +23,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   transactions: Transaction[] = [];
   showAddForm = false;
   selectedTransactions: Set<string | number> = new Set();
-  categories = [
-    { name: 'income', icon: 'fa-wallet' },
-    { name: 'groceries', icon: 'fa-shopping-basket' },
-    { name: 'utilities', icon: 'fa-bolt' },
-    { name: 'entertainment', icon: 'fa-film' },
-    { name: 'food', icon: 'fa-utensils' },
-    { name: 'transportation', icon: 'fa-car' },
-    { name: 'housing', icon: 'fa-home' },
-  ];
   transactionForm: FormGroup;
   editingTransaction: Transaction | null = null;
   editForm: FormGroup;
+  categories = CATEGORIES;
 
   constructor(
     private fb: FormBuilder,
