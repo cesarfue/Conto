@@ -8,7 +8,7 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { Transaction } from '../../models/transactions.module';
+import { Transaction } from '../../models/transactions.model';
 
 @Component({
   selector: 'app-dashboard',
