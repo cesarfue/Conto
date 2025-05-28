@@ -36,7 +36,6 @@ public class JwtFilter extends OncePerRequestFilter {
       String token = authHeader.substring(7);
 
       try {
-        // Use your JwtService to validate and get the username
         String username = jwtService.extractSubject(token);
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null,
@@ -45,8 +44,7 @@ public class JwtFilter extends OncePerRequestFilter {
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
       } catch (Exception e) {
-        // Token is invalid, don't set authentication
-        // Optionally log the error
+        System.out.println("JwtFilter: Token is invalid");
       }
     }
 
