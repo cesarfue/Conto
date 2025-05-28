@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { TransactionService } from '../../services/transaction.service';
@@ -122,8 +122,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  startEdit(transaction: Transaction): void {
-    console.log('startEdit()');
+  startEdit(transaction: Transaction, event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
     this.editingTransaction = transaction;
     this.editForm = this.fb.group({
       date: [
@@ -135,10 +137,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
       outflow: [transaction.amount < 0 ? Math.abs(transaction.amount) : ''],
       inflow: [transaction.amount > 0 ? transaction.amount : ''],
     });
+
+    setTimeout(() => {
+      const dateInput = document.querySelector(`input[formControlName="date"]`);
+      if (dateInput) {
+        (dateInput as HTMLElement).focus();
+      }
+    }, 50);
   }
 
   saveEdit(): void {
-    console.log('saveEdit()');
     if (this.editForm.valid && this.editingTransaction) {
       const formData = this.editForm.value;
       const outflow = parseFloat(formData.outflow) || 0;
@@ -159,7 +167,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.editForm.reset();
   }
 
-  log(str: string): void {
-    console.log(str);
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.editingTransaction) {
+      const target = event.target as HTMLElement;
+      const editForm = target.closest('.edit-form-grid');
+
+      if (!editForm) {
+        this.saveEdit();
+      }
+    }
   }
 }

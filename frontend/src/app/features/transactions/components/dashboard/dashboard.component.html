@@ -1,4 +1,5 @@
 <div class="dashboard-container">
+  <!--Add Transaction Button-->
   <div class="action-bar">
     <button class="add-transaction-btn" (click)="onAddTransaction()">
       <i class="fa fa-plus"></i> Add Transaction
@@ -13,6 +14,7 @@
     <div class="grid-header">OUTFLOW</div>
     <div class="grid-header">INFLOW</div>
 
+    <!-- If "Add Transaction" was clicked : -->
     @if (showAddForm) {
       <div class="inline-form-wrapper" [formGroup]="transactionForm">
         <input type="checkbox" checked class="transaction-checkbox" />
@@ -61,6 +63,7 @@
       </div>
     }
 
+    <!--Transaction List -->
     @for (transaction of transactions; track transaction.id) {
       <input
         type="checkbox"
@@ -69,78 +72,70 @@
         (change)="onSelectionChange(transaction.id, $event)"
       />
 
+      <!-- Editing view -->
       @if (editingTransaction && editingTransaction.id === transaction.id) {
-        <div [formGroup]="editForm">
+        <div [formGroup]="editForm" class="edit-form-grid">
           <input
             type="date"
             formControlName="date"
             class="grid-input"
-            (blur)="saveEdit()"
             (keydown.enter)="saveEdit()"
           />
-        </div>
-
-        <div [formGroup]="editForm">
           <select
             formControlName="category"
             class="grid-input"
-            (blur)="saveEdit()"
             (keydown.enter)="saveEdit()"
           >
             <option value="">Select category</option>
             @for (category of categories; track category) {
-              <option [value]="category.name">
-                {{ category.name }}
-              </option>
+              <option [value]="category.name">{{ category.name }}</option>
             }
           </select>
-        </div>
-        <div [formGroup]="editForm">
           <input
             type="text"
             formControlName="memo"
-            placeholder="memo"
+            placeholder=""
             class="grid-input"
-            (blur)="saveEdit()"
             (keydown.enter)="saveEdit()"
           />
-        </div>
-        <div [formGroup]="editForm">
           <input
             type="number"
             formControlName="outflow"
             placeholder="0.00"
             class="grid-input amount-input"
-            (blur)="saveEdit()"
             (keydown.enter)="saveEdit()"
           />
-        </div>
-        <div [formGroup]="editForm">
           <input
             type="number"
             formControlName="inflow"
             placeholder="0.00"
             class="grid-input amount-input"
-            (blur)="saveEdit()"
             (keydown.enter)="saveEdit()"
           />
         </div>
       } @else {
-        <div class="grid-cell" (click)="startEdit(transaction)">
+        <!--Normal view-->
+        <div class="grid-cell" (click)="startEdit(transaction, $event)">
           {{ transaction.date | date: "dd/MM/yyyy" }}
         </div>
-        <div class="grid-cell" (click)="startEdit(transaction)">
+        <div class="grid-cell" (click)="startEdit(transaction, $event)">
           {{ transaction.category }}
         </div>
-        <div class="grid-cell" (click)="startEdit(transaction)">
+        <div class="grid-cell" (click)="startEdit(transaction, $event)">
           {{ transaction.memo }}
         </div>
-        <div class="grid-cell amount-cell" (click)="startEdit(transaction)">
+        <div
+          class="grid-cell amount-cell"
+          (click)="startEdit(transaction, $event)"
+        >
           @if (transaction.amount < 0) {
             {{ -transaction.amount | currency: "EUR" : "symbol" : "1.2-2" }}
           }
         </div>
-        <div class="grid-cell amount-cell" (click)="startEdit(transaction)">
+        <div
+          class="grid-cell amount-cell"
+          (click)="startEdit(transaction, $event)"
+        >
           @if (transaction.amount > 0) {
             {{ transaction.amount | currency: "EUR" : "symbol" : "1.2-2" }}
           }
@@ -149,6 +144,7 @@
     }
   </div>
 
+  <!--Selected Transactions menu-->
   @if (selectedTransactions.size >= 1) {
     <div class="selected-transactions">
       <span class="selected-count"

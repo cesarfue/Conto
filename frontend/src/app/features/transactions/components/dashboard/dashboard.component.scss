@@ -1,5 +1,10 @@
 @use "styles/colors.scss" as colors;
 
+.inline-form-wrapper,
+.edit-form-grid {
+  display: contents;
+}
+
 .dashboard-container {
   padding: 25px;
   margin: 0 auto;
@@ -76,10 +81,6 @@
   i {
     font-size: 12px;
   }
-}
-
-.inline-form-wrapper {
-  display: contents; // This makes the wrapper transparent to the grid
 }
 
 .grid-input {

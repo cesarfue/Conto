@@ -64,7 +64,6 @@ export class TransactionService {
       'transactions',
       JSON.stringify(this.transactionsSubject.getValue()),
     );
-    console.log('saveTransactions()');
   }
 
   getTransaction(id: string | number): Transaction | null {
