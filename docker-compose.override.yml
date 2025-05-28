@@ -11,3 +11,11 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
     command: npm run start
+
+  backend:
+    volumes:
+      - ./backend:/app
+      - ~/.gradle:/root/.gradle
+    environment:
+      - SPRING_DEVTOOLS_RESTART_ENABLED=true
+      - SPRING_DEVTOOLS_LIVERELOAD_ENABLED=true
