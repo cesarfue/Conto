@@ -1,43 +1,111 @@
-<form (ngSubmit)="onRegister()">
+<form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+  <!-- Email Field -->
   <div class="input-group">
     <div class="icon-container">
       <i class="fa fa-envelope"></i>
     </div>
     <input
-      [(ngModel)]="email"
+      formControlName="email"
       placeholder="Email address"
-      name="email"
-      autocomplete="username"
-      required
+      type="email"
+      [class.error]="email?.invalid && email?.touched"
     />
   </div>
 
+  @if (email?.invalid && email?.touched) {
+    <div class="error-message">
+      @if (email?.errors?.["required"]) {
+        <span>Email is required</span>
+      }
+      @if (email?.errors?.["email"]) {
+        <span>Please enter a valid email address</span>
+      }
+    </div>
+  }
+
+  <!-- Password Field -->
   <div class="input-group">
     <div class="icon-container">
       <i class="fa fa-lock"></i>
     </div>
     <input
-      [(ngModel)]="password"
+      formControlName="password"
       placeholder="Password"
-      name="password"
       [type]="showPassword ? 'text' : 'password'"
-      required
-      autocomplete="current-password"
+      [class.error]="password?.invalid && password?.touched"
     />
     <div class="show-password">
       <input
         type="checkbox"
-        id="showPass"
-        [(ngModel)]="showPassword"
-        name="showPassword"
+        id="showPassword"
+        (change)="showPassword = !showPassword"
       />
-      <label for="showPass">Show</label>
+      <label for="showPassword">Show</label>
     </div>
   </div>
 
-  @if (showError) {
-    <div class="error-container">{{ errorMessage }}</div>
+  <!-- Password Requirements -->
+  @if (password?.invalid && password?.touched) {
+    <div class="password-requirements">
+      Password must contain at least 8 characters with uppercase, lowercase,
+      number, and special character.
+    </div>
   }
 
-  <button type="submit" class="primary-button">Register</button>
+  <!-- Confirm Password Field -->
+  <div class="input-group">
+    <div class="icon-container">
+      <i class="fa fa-lock"></i>
+    </div>
+    <input
+      formControlName="confirmPassword"
+      placeholder="Confirm password"
+      [type]="showConfirmPassword ? 'text' : 'password'"
+      [class.error]="
+        (confirmPassword?.invalid && confirmPassword?.touched) ||
+        registerForm.errors?.['passwordMismatch']
+      "
+    />
+    <div class="show-password">
+      <input
+        type="checkbox"
+        id="showConfirmPassword"
+        (change)="showConfirmPassword = !showConfirmPassword"
+      />
+      <label for="showConfirmPassword">Show</label>
+    </div>
+  </div>
+
+  @if (confirmPassword?.invalid && confirmPassword?.touched) {
+    <div class="error-message">
+      <span>Please confirm your password</span>
+    </div>
+  }
+
+  @if (registerForm.errors?.["passwordMismatch"] && confirmPassword?.touched) {
+    <div class="error-message">
+      <span>Passwords do not match</span>
+    </div>
+  }
+
+  <!-- General Error Message -->
+  @if (errorMessage) {
+    <div class="error-message general-error">
+      <i class="fa fa-exclamation-triangle"></i>
+      {{ errorMessage }}
+    </div>
+  }
+
+  <!-- Submit Button -->
+  <button
+    type="submit"
+    class="primary-button"
+    [disabled]="registerForm.invalid || isLoading"
+  >
+    @if (isLoading) {
+      <i class="fa fa-spinner fa-spin"></i> Creating Account...
+    } @else {
+      Create Account
+    }
+  </button>
 </form>

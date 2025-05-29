@@ -1,14 +1,12 @@
-<form (ngSubmit)="onLogin()">
+<form [formGroup]="loginForm" (ngSubmit)="onLogin()">
   <div class="input-group">
     <div class="icon-container">
       <i class="fa fa-envelope"></i>
     </div>
     <input
-      [(ngModel)]="email"
+      formControlName="email"
       placeholder="Email address"
-      name="email"
       autocomplete="username"
-      required
     />
   </div>
 
@@ -17,19 +15,17 @@
       <i class="fa fa-lock"></i>
     </div>
     <input
-      [(ngModel)]="password"
+      formControlName="password"
       placeholder="Password"
-      name="password"
       [type]="showPassword ? 'text' : 'password'"
-      required
       autocomplete="current-password"
     />
     <div class="show-password">
       <input
         type="checkbox"
         id="showPass"
-        [(ngModel)]="showPassword"
-        name="showPassword"
+        [checked]="showPassword"
+        (change)="showPassword = !showPassword"
       />
       <label for="showPass">Show</label>
     </div>
@@ -40,8 +36,8 @@
       <input
         type="checkbox"
         id="keepLoggedIn"
-        [(ngModel)]="keepLoggedIn"
-        name="keepLoggedIn"
+        [checked]="keepLoggedIn"
+        (change)="keepLoggedIn = !keepLoggedIn"
       />
       <label for="keepLoggedIn">Keep me logged in</label>
     </div>

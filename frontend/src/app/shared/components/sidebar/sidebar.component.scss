@@ -1,7 +1,7 @@
 @use 'styles/colors.scss' as colors;
 
 .sidebar {
-  width: 100%;
+  width: 25vh;
   height: 100%;
   background-color: colors.$dark;
   color: white;

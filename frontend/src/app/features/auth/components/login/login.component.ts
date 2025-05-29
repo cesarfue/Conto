@@ -1,32 +1,40 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
-import { FormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { GoogleAuthService } from '../../services/google-auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
 export class LoginComponent implements OnInit {
-  email = '';
-  password = '';
+  loginForm: FormGroup;
   showPassword: boolean = false;
   keepLoggedIn: boolean = false;
-
   errorMessage: string = '';
   showError: boolean = false;
 
   private auth = inject(AuthService);
   private googleAuthService = inject(GoogleAuthService);
+  private fb = inject(FormBuilder);
+
+  constructor() {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]],
+    });
+  }
 
   ngOnInit() {
-    // Initialize Google Identity Services
     this.googleAuthService.initialize();
-
-    // Render the Google button once the service is initialized
     this.googleAuthService.isInitialized$.subscribe((initialized) => {
       if (initialized) {
         this.googleAuthService.renderButton('google-button-container');
@@ -35,20 +43,31 @@ export class LoginComponent implements OnInit {
   }
 
   onLogin() {
-    this.auth.login(this.email, this.password).subscribe({
-      next: () => {
-        console.log('Login successful');
-      },
-      error: (error) => {
-        this.showError = true;
-        if (error.status === 404) {
-          this.errorMessage = 'Email not found';
-        } else if (error.status === 401) {
-          this.errorMessage = 'Invalid password';
-        } else {
-          this.errorMessage = 'Login failed. Please try again.';
-        }
-      },
-    });
+    this.showError = false;
+    this.errorMessage = '';
+
+    if (this.loginForm.valid) {
+      const { email, password } = this.loginForm.value;
+
+      this.auth.login(email, password).subscribe({
+        next: () => {
+          console.log('Login successful');
+        },
+        error: (error) => {
+          this.showError = true;
+
+          if (error.status === 404) {
+            this.errorMessage = 'Email not found';
+          } else if (error.status === 401) {
+            this.errorMessage = 'Invalid password';
+          } else {
+            this.errorMessage = error.status + ': Login failed';
+          }
+        },
+      });
+    } else {
+      this.showError = true;
+      this.errorMessage = 'Invalid password or username';
+    }
   }
 }

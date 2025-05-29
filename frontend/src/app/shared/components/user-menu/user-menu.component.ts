@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, HostListener } from '@angular/core';
 import { GoogleAuthService } from '../../../features/auth/services/google-auth.service';
 
 @Component({
@@ -18,7 +18,18 @@ export class UserMenuComponent {
     return localStorage.getItem('userName') || 'User';
   }
 
-  constructor(private googleAuthService: GoogleAuthService) {}
+  constructor(
+    private googleAuthService: GoogleAuthService,
+    public elementRef: ElementRef,
+  ) {}
+
+  hideUserMenu() {
+    this.isUserMenuOpen = false;
+  }
+
+  showUserMenu() {
+    this.isUserMenuOpen = true;
+  }
 
   toggleUserMenu() {
     this.isUserMenuOpen = !this.isUserMenuOpen;
@@ -26,5 +37,12 @@ export class UserMenuComponent {
 
   signOut() {
     this.googleAuthService.signOut().subscribe();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event) {
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.isUserMenuOpen = false;
+    }
   }
 }
