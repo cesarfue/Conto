@@ -1,6 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { catchError, finalize } from 'rxjs/operators';
-import { BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { jwtDecode } from 'jwt-decode';
 
@@ -81,25 +80,5 @@ export class GoogleAuthService {
     if (this.isInitialized.value) {
       google.accounts.id.prompt();
     }
-  }
-
-  signOut() {
-    if (typeof google !== 'undefined' && google.accounts) {
-      google.accounts.id.disableAutoSelect();
-    }
-
-    localStorage.removeItem('token');
-    localStorage.removeItem('userPicture');
-    localStorage.removeItem('userName');
-
-    return this.http.post('http://localhost:8080/api/auth/logout', {}).pipe(
-      catchError((error) => {
-        console.error('Error during logout:', error);
-        return of(null);
-      }),
-      finalize(() => {
-        window.location.href = '/auth';
-      }),
-    );
   }
 }

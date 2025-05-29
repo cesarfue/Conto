@@ -1,0 +1,72 @@
+<div class="organization-container">
+  <div class="organization-card">
+    <h1>Join or Create an Organization</h1>
+    <p class="subtitle">You need to be part of an organization to continue</p>
+
+    <div class="mode-toggle">
+      <button
+        class="toggle-btn"
+        [class.active]="isJoinMode"
+        (click)="isJoinMode = true"
+      >
+        Join Organization
+      </button>
+      <button
+        class="toggle-btn"
+        [class.active]="!isJoinMode"
+        (click)="isJoinMode = false"
+      >
+        Create Organization
+      </button>
+    </div>
+
+    @if (isJoinMode) {
+      <form (ngSubmit)="onJoinOrganization()" class="organization-form">
+        <div class="input-group">
+          <label for="joinCode">Organization Join Code</label>
+          <input
+            id="joinCode"
+            [(ngModel)]="joinCode"
+            placeholder="Enter join code"
+            name="joinCode"
+            required
+          />
+        </div>
+        <button type="submit" class="primary-button">Join Organization</button>
+        <p class="help-text">
+          Ask your organization administrator for the join code
+        </p>
+      </form>
+    } @else {
+      <form (ngSubmit)="onCreateOrganization()" class="organization-form">
+        <div class="input-group">
+          <label for="organizationName">Organization Name</label>
+          <input
+            id="organizationName"
+            [(ngModel)]="organizationName"
+            placeholder="Enter organization name"
+            name="organizationName"
+            required
+          />
+        </div>
+        <div class="input-group">
+          <label for="organizationEmail">Organization Email</label>
+          <input
+            id="organizationEmail"
+            [(ngModel)]="organizationEmail"
+            placeholder="Enter organization email"
+            name="organizationEmail"
+            type="email"
+            required
+          />
+        </div>
+        <button type="submit" class="primary-button">
+          Create Organization
+        </button>
+        <p class="help-text">
+          You will become the administrator of this organization
+        </p>
+      </form>
+    }
+  </div>
+</div>

@@ -4,6 +4,9 @@ set -e
 
 echo "Starting backend development environment..."
 
+# Stop any existing Gradle daemons
+./gradlew --stop
+
 # Start continuous compilation in background
 echo "Starting continuous compilation..."
 ./gradlew compileJava --continuous &
@@ -23,6 +26,7 @@ cleanup() {
     echo "Shutting down processes..."
     kill $COMPILE_PID 2>/dev/null || true
     kill $BOOT_PID 2>/dev/null || true
+    ./gradlew --stop 2>/dev/null || true
     exit 0
 }
 

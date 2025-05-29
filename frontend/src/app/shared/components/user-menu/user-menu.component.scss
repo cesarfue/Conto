@@ -17,6 +17,7 @@
   &:hover {
     background-color: rgba(0, 0, 0, 0.05);
   }
+
 }
 
 .user-avatar {
@@ -28,125 +29,57 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.user-avatar-placeholder {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(45deg, #4a6bff, #2a46e8); // Nice blue gradient
-  color: white;
+.user-info {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  margin-right: 0.75rem;
-  font-size: 16px;
-  border: 2px solid #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 
-.user-name {
-  font-weight: 500;
-  color: white;
+  .organization-name {
+    margin-top: 0.2rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
 }
 
 .user-dropdown {
   position: absolute;
-  left: 0; // Position dropdown to the left
-  bottom: calc(100% + 5px); // Add a small gap
+  left: 0;
+  bottom: calc(100% + 5px);
   width: 220px;
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   overflow: hidden;
 
-  // Menu header
-  .menu-header {
-    padding: 1rem;
-    border-bottom: 1px solid #eee;
-
-    .user-info {
-      display: flex;
-      align-items: center;
-
-      .user-avatar-large {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        margin-right: 12px;
-        border: 2px solid #fff;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      }
-
-      .user-avatar-placeholder-large {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        background: linear-gradient(45deg, #4a6bff, #2a46e8);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        margin-right: 12px;
-        font-size: 20px;
-      }
-
-      .user-details {
-        .user-name {
-          font-weight: 600;
-          font-size: 16px;
-          margin-bottom: 2px;
-        }
-
-        .user-email {
-          font-size: 14px;
-          color: white;
-        }
-      }
-    }
-  }
-
-  // Menu items
   ul {
     list-style: none;
     padding: 0;
     margin: 0;
 
-    li {
-      a {
+    a {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      color: #333;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.2s;
+
+      .menu-icon {
+        margin-right: 10px;
+        width: 20px;
+        height: 20px;
         display: flex;
         align-items: center;
-        padding: 0.75rem 1rem;
-        color: #333;
-        text-decoration: none;
-        cursor: pointer;
-        transition: background-color 0.2s;
-
-        .menu-icon {
-          margin-right: 10px;
-          width: 20px;
-          height: 20px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        &:hover {
-          background-color: #f5f7ff;
-          color: #4a6bff;
-        }
+        justify-content: center;
       }
+    }
 
-      &.sign-out {
-        a {
-          color: #e74c3c;
-
-          &:hover {
-            background-color: #fef5f5;
-            color: #c0392b;
-          }
-        }
-      }
+    &:hover {
+      background-color: #f5f7ff;
+      color: #4a6bff;
     }
   }
 }

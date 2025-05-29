@@ -3,8 +3,10 @@ package com.example.backend.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,6 +18,7 @@ import com.example.backend.service.JwtService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -88,20 +91,45 @@ public class AuthController {
 
   @PostMapping("/logout")
   public ResponseEntity<?> logout(HttpServletRequest request) {
-    // Get the Authorization header
     String authHeader = request.getHeader("Authorization");
 
     if (authHeader != null && authHeader.startsWith("Bearer ")) {
-      // Extract token
       String token = authHeader.substring(7);
-
-      // You could add the token to a blacklist or perform other invalidation
-      // This depends on your JWT implementation
-
-      // For example, if using a token store:
-      // tokenStore.revokeToken(token);
     }
 
     return ResponseEntity.ok(Map.of("message", "Successfully logged out"));
+  }
+
+  @GetMapping("/status")
+  public ResponseEntity<?> getUserStatus(@RequestHeader("Authorization") String authHeader) {
+    try {
+      String token = authHeader.replace("Bearer ", "");
+      String email = jwtService.extractSubject(token);
+
+      User user = userRepository.findByEmail(email)
+          .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+
+      boolean hasOrganization = user.getOrganization() != null;
+      String userEmail = user.getEmail() != null ? user.getEmail() : "unknown";
+
+      Map<String, Object> response = new HashMap<>();
+      response.put("hasOrganization", hasOrganization);
+      response.put("email", userEmail);
+
+      if (hasOrganization) {
+        response.put("organizationId", user.getOrganization().getId());
+        response.put("organizationName", user.getOrganization().getName());
+      } else {
+        response.put("organizationId", null);
+        response.put("organizationName", null);
+      }
+
+      return ResponseEntity.ok(response);
+
+    } catch (Exception e) {
+      System.err.println("Error in getUserStatus: " + e.getMessage());
+      e.printStackTrace();
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error getting user status");
+    }
   }
 }

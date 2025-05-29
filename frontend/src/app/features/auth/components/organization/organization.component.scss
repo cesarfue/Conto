@@ -1,0 +1,196 @@
+@use 'styles/colors.scss' as colors;
+
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  background-color: colors.$light;
+  padding: 20px;
+}
+
+.organization-container {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.organization-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  text-align: center;
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 600;
+  }
+
+  .subtitle {
+    color: #666;
+    margin-bottom: 32px;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+}
+
+.mode-toggle {
+  display: flex;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 32px;
+  border: 1px solid #e9ecef;
+
+  .toggle-btn {
+    flex: 1;
+    padding: 12px 16px;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #666;
+
+    &:hover {
+      color: #333;
+    }
+
+    &.active {
+      background-color: white;
+      color: colors.$dark;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+.organization-form {
+  text-align: left;
+
+  .input-group {
+    margin-bottom: 20px;
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #333;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      background-color: white;
+
+      &:focus {
+        outline: none;
+        border-color: colors.$dark;
+        box-shadow: 0 0 0 3px rgba(75, 110, 89, 0.1);
+      }
+
+      &::placeholder {
+        color: #999;
+      }
+    }
+  }
+
+  .primary-button {
+    width: 100%;
+    padding: 14px;
+    background-color: colors.$dark;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 16px;
+
+    &:hover {
+      background-color: darken(colors.$dark, 8%);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  .help-text {
+    color: #666;
+    font-size: 14px;
+    text-align: center;
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+// Responsive design
+@media (max-width: 600px) {
+  :host {
+    padding: 16px;
+  }
+
+  .organization-card {
+    padding: 24px;
+
+    h1 {
+      font-size: 1.75rem;
+    }
+  }
+
+  .mode-toggle {
+    .toggle-btn {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+  }
+}
+
+// Loading state styles (if you want to add them later)
+.loading {
+  .primary-button {
+    background-color: #ccc;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: #ccc;
+      transform: none;
+    }
+  }
+}
+
+// Error state styles (if you want to add them later)
+.error {
+  .input-group input {
+    border-color: #dc3545;
+
+    &:focus {
+      border-color: #dc3545;
+      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
+  }
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+}

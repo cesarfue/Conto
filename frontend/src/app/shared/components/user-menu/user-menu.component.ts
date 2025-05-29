@@ -1,14 +1,18 @@
-import { Component, ElementRef, HostListener } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { GoogleAuthService } from '../../../features/auth/services/google-auth.service';
+import { AuthService } from '../../../features/auth/services/auth.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-user-menu',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './user-menu.component.html',
   styleUrl: './user-menu.component.scss',
 })
-export class UserMenuComponent {
+export class UserMenuComponent implements OnInit {
   isUserMenuOpen = false;
+  organizationName: string | null = null;
+  isLoadingOrganization = true;
 
   get userPicture(): string | null {
     return localStorage.getItem('userPicture');
@@ -20,8 +24,26 @@ export class UserMenuComponent {
 
   constructor(
     private googleAuthService: GoogleAuthService,
+    private authService: AuthService,
     public elementRef: ElementRef,
   ) {}
+
+  ngOnInit() {
+    this.loadUserStatus();
+  }
+
+  private loadUserStatus() {
+    this.authService.getUserStatus().subscribe({
+      next: (status) => {
+        this.organizationName = status.organizationName;
+        this.isLoadingOrganization = false;
+      },
+      error: (error) => {
+        console.error('Failed to load user status:', error);
+        this.isLoadingOrganization = false;
+      },
+    });
+  }
 
   hideUserMenu() {
     this.isUserMenuOpen = false;
@@ -36,7 +58,7 @@ export class UserMenuComponent {
   }
 
   signOut() {
-    this.googleAuthService.signOut().subscribe();
+    this.authService.logout().subscribe();
   }
 
   @HostListener('document:click', ['$event'])

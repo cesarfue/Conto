@@ -5,7 +5,10 @@
     } @else {
       <div class="user-avatar-placeholder">{{ userName.charAt(0) }}</div>
     }
-    <span>{{ userName }}</span>
+    <div class="user-info">
+      <div class="user-name">{{ userName }}</div>
+      <div class="organization-name">{{ organizationName }}</div>
+    </div>
     <i class="dropdown-icon">▼</i>
   </button>
 

@@ -1,6 +1,8 @@
 package com.example.backend.model;
 
 import jakarta.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,19 @@ public class User {
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
   @JsonManagedReference
   private List<Transaction> transactions = new ArrayList<>();
+
+  @ManyToOne
+  @JoinColumn(name = "organization_id")
+  @JsonBackReference
+  private Organization organization;
+
+  public Organization getOrganization() {
+    return organization;
+  }
+
+  public void setOrganization(Organization organization) {
+    this.organization = organization;
+  }
 
   // Getters and setters
   public Long getId() {

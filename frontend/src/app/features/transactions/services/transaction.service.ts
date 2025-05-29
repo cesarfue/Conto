@@ -25,7 +25,6 @@ export class TransactionService {
             ...t,
             date: new Date(t.date),
           }));
-          console.log(processedTransactions);
           this.transactionsSubject.next(processedTransactions);
           this.saveToLocalStorage();
         },
