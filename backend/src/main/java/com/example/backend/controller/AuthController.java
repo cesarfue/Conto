@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.backend.model.Association;
-import com.example.backend.repository.AssociationRepository;
+import com.example.backend.model.User;
+import com.example.backend.repository.UserRepository;
 import com.example.backend.service.GoogleAuthService;
 import com.example.backend.service.JwtService;
 
@@ -23,7 +23,7 @@ import java.util.Map;
 public class AuthController {
 
   @Autowired
-  private AssociationRepository associationRepository;
+  private UserRepository userRepository;
   @Autowired
   private JwtService jwtService;
   @Autowired
@@ -34,10 +34,10 @@ public class AuthController {
     String email = request.get("email");
     String password = request.get("password");
 
-    Association association = associationRepository.findByEmail(email)
+    User user = userRepository.findByEmail(email)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Email not found"));
 
-    if (!association.getPassword().equals(password)) {
+    if (!user.getPassword().equals(password)) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password");
     }
 
@@ -51,19 +51,18 @@ public class AuthController {
     String password = request.get("password");
 
     // Check if user already exists
-    if (associationRepository.findByEmail(email).isPresent()) {
+    if (userRepository.findByEmail(email).isPresent()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already registered");
     }
 
     System.out.println("user registered with credentials: " + email + ", " + password);
 
-    Association newAssociation = new Association();
-    newAssociation.setEmail(email);
+    User newUser = new User();
+    newUser.setEmail(email);
 
-    // TODO: hash this in prod
-    newAssociation.setPassword(password);
+    newUser.setPassword(password);
 
-    associationRepository.save(newAssociation);
+    userRepository.save(newUser);
 
     String token = jwtService.generateToken(email);
     return ResponseEntity.ok(Map.of("token", token));

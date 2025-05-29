@@ -1,6 +1,9 @@
 package com.example.backend.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class User {
@@ -8,43 +11,39 @@ public class User {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private String name;
-  private String role;
+  private String email;
+  private String password;
 
-  @ManyToOne(optional = false)
-  @JoinColumn(name = "association_id", nullable = false)
-  private Association association;
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  @JsonManagedReference
+  private List<Transaction> transactions = new ArrayList<>();
 
+  // Getters and setters
   public Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
-    this.id = id;
+  public String getPassword() {
+    return password;
   }
 
-  public String getName() {
-    return name;
+  public void setPassword(String password) {
+    this.password = password;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public String getEmail() {
+    return email;
   }
 
-  public String getRole() {
-    return role;
+  public void setEmail(String email) {
+    this.email = email;
   }
 
-  public void setRole(String role) {
-    this.role = role;
+  public List<Transaction> getTransactions() {
+    return transactions;
   }
 
-  public Association getAssociation() {
-    return association;
+  public void setTransactions(List<Transaction> transactions) {
+    this.transactions = transactions;
   }
-
-  public void setAssociation(Association association) {
-    this.association = association;
-  }
-
 }

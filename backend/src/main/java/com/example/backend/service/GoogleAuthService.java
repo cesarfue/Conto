@@ -7,8 +7,8 @@ import org.springframework.web.server.ResponseStatusException;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.example.backend.model.Association;
-import com.example.backend.repository.AssociationRepository;
+import com.example.backend.model.User;
+import com.example.backend.repository.UserRepository;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -20,7 +20,7 @@ public class GoogleAuthService {
   private GoogleIdTokenVerifier verifier;
 
   @Autowired
-  private AssociationRepository associationRepository;
+  private UserRepository userRepository;
 
   @Autowired
   private JwtService jwtService;
@@ -45,15 +45,15 @@ public class GoogleAuthService {
       }
 
       // Check if user exists in your database
-      Association association = associationRepository.findByEmail(email)
+      User user = userRepository.findByEmail(email)
           .orElseGet(() -> {
             // Create a new user if they don't exist
-            Association newAssociation = new Association();
-            newAssociation.setEmail(email);
+            User newUser = new User();
+            newUser.setEmail(email);
             // Generate a secure random password since they'll be logging in with Google
-            newAssociation.setPassword(generateSecureRandomPassword());
+            newUser.setPassword(generateSecureRandomPassword());
             // You could also save the name and picture URL
-            return associationRepository.save(newAssociation);
+            return userRepository.save(newUser);
           });
 
       // Generate JWT token for the authenticated user

@@ -1,11 +1,11 @@
 package com.example.backend.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.backend.model.User;
-import java.util.List;
-import com.example.backend.model.Association;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-  List<User> findByAssociation(Association association);
+  Optional<User> findByEmail(String email);
 }

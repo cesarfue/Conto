@@ -147,12 +147,6 @@ export class TransactionService {
       });
   }
 
-  private loadFromLocalStorage(): void {
-    const savedTransactions = localStorage.getItem('transactions');
-    const initialData = savedTransactions ? JSON.parse(savedTransactions) : [];
-    this.transactionsSubject.next(initialData);
-  }
-
   private saveToLocalStorage(): void {
     localStorage.setItem(
       'transactions',
