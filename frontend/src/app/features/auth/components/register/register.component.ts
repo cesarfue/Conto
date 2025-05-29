@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
 
@@ -12,11 +12,28 @@ export class RegisterComponent {
   email = '';
   password = '';
 
-  constructor(private auth: AuthService) {}
+  showPassword: boolean = false;
+  errorMessage: string = '';
+  showError: boolean = false;
+
+  private auth = inject(AuthService);
 
   onRegister() {
-    this.auth.register(this.email, this.password).subscribe(() => {
-      alert('Registered');
+    this.auth.register(this.email, this.password).subscribe({
+      next: () => {
+        console.log('Register successeful');
+      },
+      error: (error) => {
+        this.showError = true;
+
+        if (error.status === 404) {
+          this.errorMessage = 'Email not found';
+        } else if (error.status === 401) {
+          this.errorMessage = 'Invalid password';
+        } else {
+          this.errorMessage = 'Register failed. Please try again.';
+        }
+      },
     });
   }
 }

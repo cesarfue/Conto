@@ -19,6 +19,10 @@ export class GoogleAuthService {
     '1068314139716-ooc63lc2fufv5sjpak0nqcmfu3r2nvol.apps.googleusercontent.com';
 
   initialize() {
+    if (typeof google === 'undefined') {
+      setTimeout(() => this.initialize(), 100);
+      return;
+    }
     try {
       google.accounts.id.initialize({
         client_id: this.clientId,

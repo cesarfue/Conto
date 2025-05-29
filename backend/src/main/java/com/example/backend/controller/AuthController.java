@@ -35,10 +35,10 @@ public class AuthController {
     String password = request.get("password");
 
     Association association = associationRepository.findByEmail(email)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Email not found"));
 
     if (!association.getPassword().equals(password)) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password");
     }
 
     String token = jwtService.generateToken(email);

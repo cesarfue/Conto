@@ -7,6 +7,7 @@
       [(ngModel)]="email"
       placeholder="Email address"
       name="email"
+      autocomplete="username"
       required
     />
   </div>
@@ -46,6 +47,10 @@
     </div>
     <a class="forgot-password">Forgot password?</a>
   </div>
+
+  @if (showError) {
+    <div class="error-container">{{ errorMessage }}</div>
+  }
 
   <button type="submit" class="primary-button">Log In</button>
 

@@ -16,6 +16,9 @@ export class LoginComponent implements OnInit {
   showPassword: boolean = false;
   keepLoggedIn: boolean = false;
 
+  errorMessage: string = '';
+  showError: boolean = false;
+
   private auth = inject(AuthService);
   private googleAuthService = inject(GoogleAuthService);
 
@@ -32,8 +35,20 @@ export class LoginComponent implements OnInit {
   }
 
   onLogin() {
-    this.auth.login(this.email, this.password).subscribe(() => {
-      alert('Logged in!');
+    this.auth.login(this.email, this.password).subscribe({
+      next: () => {
+        console.log('Login successful');
+      },
+      error: (error) => {
+        this.showError = true;
+        if (error.status === 404) {
+          this.errorMessage = 'Email not found';
+        } else if (error.status === 401) {
+          this.errorMessage = 'Invalid password';
+        } else {
+          this.errorMessage = 'Login failed. Please try again.';
+        }
+      },
     });
   }
 }

@@ -1,14 +1,43 @@
-<div class="input-group">
-  <form (ngSubmit)="onRegister()">
-    <input [(ngModel)]="email" placeholder="Email" name="email" required />
+<form (ngSubmit)="onRegister()">
+  <div class="input-group">
+    <div class="icon-container">
+      <i class="fa fa-envelope"></i>
+    </div>
+    <input
+      [(ngModel)]="email"
+      placeholder="Email address"
+      name="email"
+      autocomplete="username"
+      required
+    />
+  </div>
+
+  <div class="input-group">
+    <div class="icon-container">
+      <i class="fa fa-lock"></i>
+    </div>
     <input
       [(ngModel)]="password"
       placeholder="Password"
       name="password"
-      type="password"
+      [type]="showPassword ? 'text' : 'password'"
       required
       autocomplete="current-password"
     />
-    <button type="submit">Register</button>
-  </form>
-</div>
+    <div class="show-password">
+      <input
+        type="checkbox"
+        id="showPass"
+        [(ngModel)]="showPassword"
+        name="showPassword"
+      />
+      <label for="showPass">Show</label>
+    </div>
+  </div>
+
+  @if (showError) {
+    <div class="error-container">{{ errorMessage }}</div>
+  }
+
+  <button type="submit" class="primary-button">Register</button>
+</form>
