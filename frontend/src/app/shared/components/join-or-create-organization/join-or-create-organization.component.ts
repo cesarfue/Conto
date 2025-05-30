@@ -5,13 +5,13 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-organization',
+  selector: 'app-join-or-create-organization',
   standalone: true,
   imports: [FormsModule, CommonModule],
-  templateUrl: './organization.component.html',
-  styleUrl: './organization.component.scss',
+  templateUrl: './join-or-create-organization.component.html',
+  styleUrl: './join-or-create-organization.component.scss',
 })
-export class OrganizationComponent {
+export class JoinOrCreateOrganizationComponent {
   isJoinMode = true;
 
   joinCode = '';

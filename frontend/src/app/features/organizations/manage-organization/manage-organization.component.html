@@ -1,0 +1,180 @@
+<div class="manage-organization-container">
+  <div class="organization-panels">
+    <!-- Current Organization Panel -->
+    <div class="organization-panel">
+      <div class="panel-header">
+        <h2>Current Organization</h2>
+        @if (isLoading) {
+          <div class="loading-spinner">Loading...</div>
+        }
+      </div>
+
+      @if (!isLoading && hasOrganization) {
+        <div class="organization-info">
+          <div class="org-name-section">
+            <h3>{{ organizationName }}</h3>
+            <button class="edit-btn" (click)="toggleEditName()">
+              <i class="fa fa-edit"></i>
+            </button>
+          </div>
+
+          @if (editingName) {
+            <form (ngSubmit)="saveOrganizationName()" class="edit-form">
+              <div class="input-group">
+                <input
+                  [(ngModel)]="newOrganizationName"
+                  placeholder="Organization name"
+                  name="newOrganizationName"
+                  required
+                />
+                <button type="submit" class="save-btn">Save</button>
+                <button
+                  type="button"
+                  (click)="cancelEditName()"
+                  class="cancel-btn"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          }
+
+          <div class="organization-details">
+            <div class="detail-item">
+              <span class="label">Join Code:</span>
+              <span class="value">{{ joinCode }}</span>
+              <button class="copy-btn" (click)="copyJoinCode()">
+                <i class="fa fa-copy"></i> Copy
+              </button>
+            </div>
+            <div class="detail-item">
+              <span class="label">Members:</span>
+              <span class="value">{{ memberCount }} members</span>
+            </div>
+          </div>
+
+          <!-- Members Management -->
+          <div class="members-section">
+            <h4>Organization Members</h4>
+            <div class="members-list">
+              @for (member of members; track member.id) {
+                <div class="member-item">
+                  <div class="member-info">
+                    <span class="member-name">{{ member.email }}</span>
+                    @if (member.isAdmin) {
+                      <span class="admin-badge">Admin</span>
+                    }
+                  </div>
+                  @if (
+                    isCurrentUserAdmin &&
+                    !member.isAdmin &&
+                    member.id !== currentUserId
+                  ) {
+                    <div class="member-actions">
+                      <button
+                        class="promote-btn"
+                        (click)="promoteToAdmin(member.id)"
+                      >
+                        Make Admin
+                      </button>
+                      <button
+                        class="remove-btn"
+                        (click)="removeMember(member.id)"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  }
+                  @if (
+                    isCurrentUserAdmin &&
+                    member.isAdmin &&
+                    member.id !== currentUserId
+                  ) {
+                    <div class="member-actions">
+                      <button
+                        class="demote-btn"
+                        (click)="demoteFromAdmin(member.id)"
+                      >
+                        Remove Admin
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Invite New Members -->
+          @if (isCurrentUserAdmin) {
+            <div class="invite-section">
+              <h4>Invite New Members</h4>
+              <form (ngSubmit)="sendInvitation()" class="invite-form">
+                <div class="input-group">
+                  <input
+                    [(ngModel)]="inviteEmail"
+                    placeholder="Enter email address"
+                    name="inviteEmail"
+                    type="email"
+                    required
+                  />
+                  <button type="submit" class="invite-btn">
+                    Send Invitation
+                  </button>
+                </div>
+              </form>
+            </div>
+          }
+
+          <!-- Danger Zone -->
+          @if (isCurrentUserAdmin) {
+            <div class="danger-zone">
+              <h4>Danger Zone</h4>
+              <button class="danger-btn" (click)="confirmDeleteOrganization()">
+                Delete Organization
+              </button>
+              <p class="danger-text">This action cannot be undone.</p>
+            </div>
+          }
+        </div>
+      } @else if (!isLoading && !hasOrganization) {
+        <div class="no-organization">
+          <p>You are not currently part of any organization.</p>
+          <p>Use the panel on the right to create or join an organization.</p>
+        </div>
+      }
+    </div>
+
+    <!-- Join/Create Another Organization Panel -->
+    <div class="organization-panel">
+      <div class="panel-header">
+        <h2>Join or Create Another Organization</h2>
+        <p class="panel-subtitle">
+          Switch to a different organization or create a new one
+        </p>
+      </div>
+
+      <app-join-or-create-organization></app-join-or-create-organization>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  @if (showDeleteConfirmation) {
+    <div class="modal-overlay">
+      <div class="modal">
+        <h3>Delete Organization</h3>
+        <p>Are you sure you want to delete "{{ organizationName }}"?</p>
+        <p class="warning-text">
+          This will permanently delete all data and cannot be undone.
+        </p>
+        <div class="modal-actions">
+          <button class="cancel-btn" (click)="cancelDeleteOrganization()">
+            Cancel
+          </button>
+          <button class="danger-btn" (click)="deleteOrganization()">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
