@@ -3,7 +3,9 @@
     @if (userPicture) {
       <img class="user-avatar" [src]="userPicture" alt="User profile picture" />
     } @else {
-      <div class="user-avatar-placeholder">{{ userName.charAt(0) }}</div>
+      <div class="user-avatar-placeholder">
+        {{ userName.charAt(0).toUpperCase() }}
+      </div>
     }
     <div class="user-info">
       <div class="user-name">{{ userName }}</div>

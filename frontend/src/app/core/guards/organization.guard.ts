@@ -4,42 +4,24 @@ import { AuthService } from '../../features/auth/services/auth.service';
 import { map, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
-export const organizationAuthGuard = () => {
+export const mustHaveOrganizationGuard = () => {
   const router = inject(Router);
   const authService = inject(AuthService);
 
   return authService.getUserStatus().pipe(
     map((response) => {
       if (response.hasOrganization) {
+        console.log('User has organization');
         return true;
       } else {
-        router.navigate(['/organization']);
-        return false;
+        console.log('User doesnt have organization');
+        return router.parseUrl('/join-or-create-organization');
       }
     }),
-    catchError(() => {
-      router.navigate(['/auth']);
-      return of(false);
-    }),
-  );
-};
-
-export const organizationSelectGuard = () => {
-  const router = inject(Router);
-  const authService = inject(AuthService);
-
-  return authService.getUserStatus().pipe(
-    map((response) => {
-      if (response.hasOrganization) {
-        router.navigate(['/dashboard']);
-        return false;
-      } else {
-        return true;
-      }
-    }),
-    catchError(() => {
-      router.navigate(['/auth']);
-      return of(false);
+    catchError((error) => {
+      console.error('Error checking organization status:', error);
+      // If there's an error, redirect to auth instead of creating a loop
+      return of(router.parseUrl('/auth'));
     }),
   );
 };
