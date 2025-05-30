@@ -16,6 +16,7 @@ public class CorsConfig {
 
     // Allow all origins for development (restrict this in production)
     config.addAllowedOrigin("http://localhost:4200");
+    config.addAllowedOrigin("https://accounts.google.com");
 
     // Allow all HTTP methods
     config.addAllowedMethod("*");

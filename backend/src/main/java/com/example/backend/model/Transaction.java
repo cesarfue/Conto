@@ -25,11 +25,14 @@ public class Transaction {
   private String memo;
 
   @ManyToOne(optional = false)
-  @JoinColumn(name = "user_id", nullable = false)
+  @JoinColumn(name = "organization_id", nullable = false)
   @JsonBackReference
-  private User user;
+  private Organization organization;
 
-  // All your existing getters and setters remain the same
+  @ManyToOne(optional = true)
+  @JoinColumn(name = "created_by_user_id", nullable = true)
+  private User createdBy;
+
   public Long getId() {
     return id;
   }
@@ -78,11 +81,19 @@ public class Transaction {
     this.memo = memo;
   }
 
-  public User getUser() {
-    return user;
+  public Organization getOrganization() {
+    return organization;
   }
 
-  public void setUser(User user) {
-    this.user = user;
+  public void setOrganization(Organization organization) {
+    this.organization = organization;
+  }
+
+  public User getCreatedBy() {
+    return createdBy;
+  }
+
+  public void setCreatedBy(User createdBy) {
+    this.createdBy = createdBy;
   }
 }

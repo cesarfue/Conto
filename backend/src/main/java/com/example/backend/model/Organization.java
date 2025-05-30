@@ -30,6 +30,14 @@ public class Organization {
   @JsonManagedReference
   private List<User> users = new ArrayList<>();
 
+  @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL)
+  @JsonManagedReference
+  private List<Transaction> transactions = new ArrayList<>();
+
+  public List<Transaction> getTransactions() {
+    return transactions;
+  }
+
   public Long getId() {
     return id;
   }
