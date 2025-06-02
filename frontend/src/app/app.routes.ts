@@ -3,7 +3,8 @@ import { AuthComponent } from './features/auth/components/auth.component';
 import {
   authGuard,
   loginGuard,
-  mustHaveOrganizationGuard,
+  requiresOrganizationGuard,
+  requiresNoOrganizationGuard,
 } from './core/guards/auth.guard';
 import { DashboardComponent } from './features/transactions/components/dashboard/dashboard.component';
 import { ManageOrganizationComponent } from './features/organizations/manage-organization/manage-organization.component';
@@ -17,7 +18,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
-    canActivate: [authGuard, mustHaveOrganizationGuard],
+    canActivate: [authGuard, requiresOrganizationGuard],
   },
   {
     path: 'manage-organization',
@@ -29,6 +30,7 @@ export const routes: Routes = [
       import(
         './shared/components/join-or-create-organization/join-or-create-organization.component'
       ).then((m) => m.JoinOrCreateOrganizationComponent),
+    canActivate: [loginGuard, requiresNoOrganizationGuard],
   },
   {
     path: 'auth',

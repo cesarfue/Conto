@@ -15,8 +15,8 @@ stop:
 start:
 	@docker compose start
 
-status:
-	@docker ps
+db:
+	@docker exec -it mysql-db mysql -u root -p
 
 clean:
 	@docker compose down --volumes --remove-orphans

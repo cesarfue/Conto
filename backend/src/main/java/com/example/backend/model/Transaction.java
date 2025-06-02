@@ -2,6 +2,8 @@ package com.example.backend.model;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -26,12 +28,19 @@ public class Transaction {
 
   @ManyToOne(optional = false)
   @JoinColumn(name = "organization_id", nullable = false)
-  @JsonBackReference
+  @JsonIgnore
   private Organization organization;
 
   @ManyToOne(optional = true)
   @JoinColumn(name = "created_by_user_id", nullable = true)
+  @JsonIgnore
   private User createdBy;
+
+  @Transient
+  private Long organizationId;
+
+  @Transient
+  private Long createdByUserId;
 
   public Long getId() {
     return id;

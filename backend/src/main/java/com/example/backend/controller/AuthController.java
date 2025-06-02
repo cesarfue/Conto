@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.backend.model.User;
+import com.example.backend.model.Organization;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.service.GoogleAuthService;
 import com.example.backend.service.JwtService;
@@ -62,7 +63,6 @@ public class AuthController {
 
     User newUser = new User();
     newUser.setEmail(email);
-
     newUser.setPassword(password);
 
     userRepository.save(newUser);
@@ -109,7 +109,8 @@ public class AuthController {
       User user = userRepository.findByEmail(email)
           .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
 
-      boolean hasOrganization = user.getOrganization() != null;
+      // Use the new convenience methods
+      boolean hasOrganization = user.hasOrganization();
       String userEmail = user.getEmail() != null ? user.getEmail() : "unknown";
 
       Map<String, Object> response = new HashMap<>();
@@ -117,8 +118,9 @@ public class AuthController {
       response.put("email", userEmail);
 
       if (hasOrganization) {
-        response.put("organizationId", user.getOrganization().getId());
-        response.put("organizationName", user.getOrganization().getName());
+        Organization currentOrg = user.getCurrentOrganization();
+        response.put("organizationId", currentOrg.getId());
+        response.put("organizationName", currentOrg.getName());
       } else {
         response.put("organizationId", null);
         response.put("organizationName", null);

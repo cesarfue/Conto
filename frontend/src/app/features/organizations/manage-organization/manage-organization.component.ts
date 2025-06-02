@@ -31,6 +31,8 @@ export class ManageOrganizationComponent implements OnInit {
   isCurrentUserAdmin = false;
   currentUserId: number | null = null;
   showDeleteConfirmation = false;
+  currentPane = 0;
+  organizationsCount = 0;
 
   constructor(
     private authService: AuthService,

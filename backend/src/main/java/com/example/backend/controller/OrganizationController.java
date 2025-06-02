@@ -2,7 +2,9 @@ package com.example.backend.controller;
 
 import com.example.backend.model.Organization;
 import com.example.backend.model.User;
+import com.example.backend.model.UserOrganization;
 import com.example.backend.repository.OrganizationRepository;
+import com.example.backend.repository.UserOrganizationRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,9 @@ public class OrganizationController {
   private UserRepository userRepository;
 
   @Autowired
+  private UserOrganizationRepository userOrganizationRepository;
+
+  @Autowired
   private JwtService jwtService;
 
   @PostMapping("/create")
@@ -39,11 +44,12 @@ public class OrganizationController {
 
     Organization organization = new Organization();
     organization.setName(name);
-    organization.setAdmin(user);
     organization = organizationRepository.save(organization);
 
-    user.setOrganization(organization);
-    userRepository.save(user);
+    // Create UserOrganization relationship with ADMIN role
+    UserOrganization userOrg = new UserOrganization(user, organization, UserOrganization.UserRole.ADMIN);
+    userOrg.setCurrentOrganization(true);
+    userOrganizationRepository.save(userOrg);
 
     return ResponseEntity.ok(Map.of(
         "message", "Organization created successfully",
@@ -68,8 +74,20 @@ public class OrganizationController {
       Organization organization = organizationRepository.findById(orgId)
           .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found"));
 
-      user.setOrganization(organization);
-      userRepository.save(user);
+      // Check if user is already a member
+      if (userOrganizationRepository.findByUserAndOrganization(user, organization).isPresent()) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already a member of this organization");
+      }
+
+      // Set current organization to false for all user's organizations
+      List<UserOrganization> userOrgs = userOrganizationRepository.findByUser(user);
+      userOrgs.forEach(uo -> uo.setCurrentOrganization(false));
+      userOrganizationRepository.saveAll(userOrgs);
+
+      // Create new UserOrganization relationship
+      UserOrganization userOrg = new UserOrganization(user, organization, UserOrganization.UserRole.MEMBER);
+      userOrg.setCurrentOrganization(true);
+      userOrganizationRepository.save(userOrg);
 
       return ResponseEntity.ok(Map.of("message", "Successfully joined organization"));
     } catch (NumberFormatException e) {
@@ -85,22 +103,21 @@ public class OrganizationController {
     User user = getUserFromToken(authHeader);
 
     // Check if user belongs to this organization
-    if (user.getOrganization() == null || !user.getOrganization().getId().equals(id)) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied to this organization");
-    }
+    UserOrganization userOrg = userOrganizationRepository.findByUserAndOrganization(user,
+        organizationRepository.findById(id).orElseThrow())
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied to this organization"));
 
-    Organization organization = organizationRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found"));
+    Organization organization = userOrg.getOrganization();
 
     // Get all members of the organization
-    List<User> members = userRepository.findByOrganization(organization);
+    List<UserOrganization> memberOrgs = userOrganizationRepository.findByOrganization(organization);
 
-    List<Map<String, Object>> memberData = members.stream()
-        .map(member -> {
+    List<Map<String, Object>> memberData = memberOrgs.stream()
+        .map(memberOrg -> {
           Map<String, Object> memberInfo = new HashMap<>();
-          memberInfo.put("id", member.getId());
-          memberInfo.put("email", member.getEmail());
-          memberInfo.put("isAdmin", member.getId().equals(organization.getAdmin().getId()));
+          memberInfo.put("id", memberOrg.getUser().getId());
+          memberInfo.put("email", memberOrg.getUser().getEmail());
+          memberInfo.put("isAdmin", memberOrg.isAdmin());
           return memberInfo;
         })
         .collect(Collectors.toList());
@@ -109,7 +126,7 @@ public class OrganizationController {
     response.put("id", organization.getId());
     response.put("name", organization.getName());
     response.put("members", memberData);
-    response.put("isCurrentUserAdmin", user.getId().equals(organization.getAdmin().getId()));
+    response.put("isCurrentUserAdmin", userOrg.isAdmin());
     response.put("currentUserId", user.getId());
 
     return ResponseEntity.ok(response);
@@ -126,7 +143,10 @@ public class OrganizationController {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found"));
 
     // Check if user is admin of this organization
-    if (!user.getId().equals(organization.getAdmin().getId())) {
+    UserOrganization userOrg = userOrganizationRepository.findByUserAndOrganization(user, organization)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a member"));
+
+    if (!userOrg.isAdmin()) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can update organization");
     }
 
@@ -150,20 +170,24 @@ public class OrganizationController {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found"));
 
     // Check if user is admin of this organization
-    if (!user.getId().equals(organization.getAdmin().getId())) {
+    UserOrganization userOrg = userOrganizationRepository.findByUserAndOrganization(user, organization)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a member"));
+
+    if (!userOrg.isAdmin()) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can send invitations");
     }
 
     String email = request.get("email");
 
-    // Check if user already exists and is in an organization
+    // Check if user already exists and is in this organization
     User existingUser = userRepository.findByEmail(email).orElse(null);
-    if (existingUser != null && existingUser.getOrganization() != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in an organization");
+    if (existingUser != null) {
+      if (userOrganizationRepository.findByUserAndOrganization(existingUser, organization).isPresent()) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already in this organization");
+      }
     }
 
     // In a real application, you would send an email invitation here
-    // For now, we'll just return success
     return ResponseEntity.ok(Map.of(
         "message", "Invitation sent successfully",
         "joinCode", "ORG-" + organization.getId()));
@@ -180,7 +204,10 @@ public class OrganizationController {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found"));
 
     // Check if current user is admin
-    if (!currentUser.getId().equals(organization.getAdmin().getId())) {
+    UserOrganization currentUserOrg = userOrganizationRepository.findByUserAndOrganization(currentUser, organization)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a member"));
+
+    if (!currentUserOrg.isAdmin()) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can promote members");
     }
 
@@ -189,14 +216,14 @@ public class OrganizationController {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
     // Check if user belongs to this organization
-    if (userToPromote.getOrganization() == null || !userToPromote.getOrganization().getId().equals(id)) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a member of this organization");
-    }
+    UserOrganization userOrgToPromote = userOrganizationRepository
+        .findByUserAndOrganization(userToPromote, organization)
+        .orElseThrow(
+            () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a member of this organization"));
 
-    // Set the user as admin (you might want to have multiple admins, adjust as
-    // needed)
-    organization.setAdmin(userToPromote);
-    organizationRepository.save(organization);
+    // Promote the user
+    userOrgToPromote.setRole(UserOrganization.UserRole.ADMIN);
+    userOrganizationRepository.save(userOrgToPromote);
 
     return ResponseEntity.ok(Map.of("message", "User promoted to admin successfully"));
   }
@@ -212,12 +239,24 @@ public class OrganizationController {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found"));
 
     // Check if current user is admin
-    if (!currentUser.getId().equals(organization.getAdmin().getId())) {
+    UserOrganization currentUserOrg = userOrganizationRepository.findByUserAndOrganization(currentUser, organization)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a member"));
+
+    if (!currentUserOrg.isAdmin()) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can demote members");
     }
 
-    // For simplicity, we'll just return success since we only have one admin model
-    // In a real app, you'd have multiple admin roles
+    Long userId = Long.valueOf(request.get("userId").toString());
+    User userToDemote = userRepository.findById(userId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+    UserOrganization userOrgToDemote = userOrganizationRepository.findByUserAndOrganization(userToDemote, organization)
+        .orElseThrow(
+            () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a member of this organization"));
+
+    userOrgToDemote.setRole(UserOrganization.UserRole.MEMBER);
+    userOrganizationRepository.save(userOrgToDemote);
+
     return ResponseEntity.ok(Map.of("message", "Admin privileges removed successfully"));
   }
 
@@ -232,7 +271,10 @@ public class OrganizationController {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found"));
 
     // Check if current user is admin
-    if (!currentUser.getId().equals(organization.getAdmin().getId())) {
+    UserOrganization currentUserOrg = userOrganizationRepository.findByUserAndOrganization(currentUser, organization)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a member"));
+
+    if (!currentUserOrg.isAdmin()) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can remove members");
     }
 
@@ -240,18 +282,18 @@ public class OrganizationController {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
     // Check if user belongs to this organization
-    if (memberToRemove.getOrganization() == null || !memberToRemove.getOrganization().getId().equals(id)) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a member of this organization");
+    UserOrganization memberOrgToRemove = userOrganizationRepository
+        .findByUserAndOrganization(memberToRemove, organization)
+        .orElseThrow(
+            () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a member of this organization"));
+
+    // Can't remove another admin (you might want to modify this rule)
+    if (memberOrgToRemove.isAdmin() && !memberToRemove.getId().equals(currentUser.getId())) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot remove another admin");
     }
 
-    // Can't remove the admin
-    if (memberToRemove.getId().equals(organization.getAdmin().getId())) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot remove the organization admin");
-    }
-
-    // Remove user from organization
-    memberToRemove.setOrganization(null);
-    userRepository.save(memberToRemove);
+    // Remove the UserOrganization relationship
+    userOrganizationRepository.delete(memberOrgToRemove);
 
     return ResponseEntity.ok(Map.of("message", "Member removed successfully"));
   }
@@ -266,16 +308,16 @@ public class OrganizationController {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found"));
 
     // Check if current user is admin
-    if (!currentUser.getId().equals(organization.getAdmin().getId())) {
+    UserOrganization currentUserOrg = userOrganizationRepository.findByUserAndOrganization(currentUser, organization)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a member"));
+
+    if (!currentUserOrg.isAdmin()) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can delete organization");
     }
 
-    // Remove all users from the organization first
-    List<User> members = userRepository.findByOrganization(organization);
-    for (User member : members) {
-      member.setOrganization(null);
-      userRepository.save(member);
-    }
+    // Remove all UserOrganization relationships first
+    List<UserOrganization> memberOrgs = userOrganizationRepository.findByOrganization(organization);
+    userOrganizationRepository.deleteAll(memberOrgs);
 
     // Delete the organization
     organizationRepository.delete(organization);

@@ -23,30 +23,51 @@ export const loginGuard = () => {
   return true;
 };
 
-export const mustHaveOrganizationGuard = () => {
-  const router = inject(Router);
-  const authService = inject(AuthService);
+enum RoutePaths {
+  AUTH = '/auth',
+  DASHBOARD = '/dashboard',
+  JOIN_OR_CREATE_ORG = '/join-or-create-organization',
+}
 
-  if (!isLoggedIn()) {
-    return router.parseUrl('/auth');
-  }
+const createOrganizationStatusGuard = (
+  shouldHaveOrganization: boolean,
+  redirectPath: string,
+) => {
+  return () => {
+    const router = inject(Router);
+    const authService = inject(AuthService);
 
-  return authService.getUserStatus().pipe(
-    map((response) => {
-      if (response.hasOrganization) {
-        console.log('User has organization');
-        return true;
-      } else {
-        console.log('User doesnt have organization');
-        return router.parseUrl('/join-or-create-organization');
-      }
-    }),
-    catchError((error) => {
-      console.error('Error checking organization status:', error);
-      return of(router.parseUrl('/auth'));
-    }),
-  );
+    if (!isLoggedIn()) {
+      return router.parseUrl(RoutePaths.AUTH);
+    }
+
+    return authService.getUserStatus().pipe(
+      map((response) => {
+        const hasOrganization = response.hasOrganization;
+
+        if (hasOrganization === shouldHaveOrganization) {
+          return true;
+        } else {
+          return router.parseUrl(redirectPath);
+        }
+      }),
+      catchError((error) => {
+        console.error('Error checking organization status:', error);
+        return of(router.parseUrl(RoutePaths.AUTH));
+      }),
+    );
+  };
 };
+
+export const requiresOrganizationGuard = createOrganizationStatusGuard(
+  true,
+  RoutePaths.JOIN_OR_CREATE_ORG,
+);
+
+export const requiresNoOrganizationGuard = createOrganizationStatusGuard(
+  false,
+  RoutePaths.DASHBOARD,
+);
 
 function isLoggedIn(): boolean {
   return !!localStorage.getItem('token');

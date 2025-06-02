@@ -49,11 +49,10 @@ public class TransactionController {
     transaction.setRecipient((String) request.getOrDefault("recipient", ""));
     transaction.setMemo((String) request.getOrDefault("memo", ""));
 
-    // Link to organization instead of user
     transaction.setOrganization(organization);
-    // Track who created it
     transaction.setCreatedBy(user);
 
+    System.out.println("transaction is " + transaction.getOrganization() + transaction.getCreatedBy());
     Transaction savedTransaction = transactionRepository.save(transaction);
     return ResponseEntity.status(HttpStatus.CREATED).body(savedTransaction);
   }
@@ -154,10 +153,11 @@ public class TransactionController {
   }
 
   private Organization getUserOrganization(User user) {
-    if (user.getOrganization() == null) {
+    Organization currentOrg = user.getCurrentOrganization();
+    if (currentOrg == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
           "User must be part of an organization to manage transactions");
     }
-    return user.getOrganization();
+    return currentOrg;
   }
 }
