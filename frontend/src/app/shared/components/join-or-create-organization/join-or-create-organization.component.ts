@@ -39,8 +39,8 @@ export class JoinOrCreateOrganizationComponent {
       )
       .subscribe({
         next: () => {
-          alert('Successfully joined organization!');
-          this.router.navigate(['/dashboard']);
+          window.location.reload();
+          //this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           alert('Failed to join organization. Please check your join code.');
@@ -63,8 +63,8 @@ export class JoinOrCreateOrganizationComponent {
       )
       .subscribe({
         next: () => {
-          alert('Organization created successfully!');
-          this.router.navigate(['/dashboard']);
+          window.location.reload();
+          //this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           alert('Failed to create organization.');

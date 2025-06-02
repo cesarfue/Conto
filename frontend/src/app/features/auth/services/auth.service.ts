@@ -44,7 +44,6 @@ export class AuthService {
           // Extract name from email (everything before @)
           const userName = email.split('@')[0];
           localStorage.setItem('userName', userName);
-          this.setLoggedIn(response.token);
         }
       }),
     );
