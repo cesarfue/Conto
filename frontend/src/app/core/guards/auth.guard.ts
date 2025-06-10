@@ -18,9 +18,6 @@ const authGuard = (shouldBeAuthenticated: boolean, redirectPath: string) => {
   return () => {
     const router = inject(Router);
     const userIsAuth = isAuth();
-    console.log(
-      shouldBeAuthenticated ? 'requiresAuthGuard' : 'requiresNoAuthGuard',
-    );
 
     if (userIsAuth === shouldBeAuthenticated) {
       return true;
@@ -45,7 +42,6 @@ const organizationGuard = (
     return authService.getUserStatus().pipe(
       map((response) => {
         const hasOrganization = response.hasOrganization;
-        console.log('hasOrganization  = ', hasOrganization);
 
         if (hasOrganization === shouldHaveOrganization) {
           return true;
@@ -54,8 +50,7 @@ const organizationGuard = (
         }
       }),
       catchError((error) => {
-        console.error('Error checking organization status:', error);
-        return of(router.parseUrl(RoutePaths.AUTH));
+        throw error;
       }),
     );
   };
