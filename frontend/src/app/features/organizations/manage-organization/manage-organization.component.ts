@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { AuthService } from '../../../features/auth/services/auth.service';
+// import { UserService } from '../../../shared/services/user.service';
+import { AuthService } from '../../auth/services/auth.service';
+import { OrganizationService } from '../../../shared/services/organization.service';
 import { JoinOrCreateOrganizationComponent } from '../../../shared/components/join-or-create-organization/join-or-create-organization.component';
 
 interface Member {
@@ -31,12 +32,11 @@ export class ManageOrganizationComponent implements OnInit {
   isCurrentUserAdmin = false;
   currentUserId: number | null = null;
   showDeleteConfirmation = false;
-  currentPane = 0;
-  organizationsCount = 0;
 
   constructor(
+    // private userService: UserService,
+    private organizationService: OrganizationService,
     private authService: AuthService,
-    private http: HttpClient,
   ) {}
 
   ngOnInit() {
@@ -63,13 +63,10 @@ export class ManageOrganizationComponent implements OnInit {
   }
 
   private loadOrganizationDetails() {
-    const headers = this.getAuthHeaders();
+    if (!this.organizationId) return;
 
-    this.http
-      .get<any>(
-        `http://localhost:8080/api/organizations/${this.organizationId}`,
-        { headers },
-      )
+    this.organizationService
+      .getOrganizationDetails(this.organizationId)
       .subscribe({
         next: (org) => {
           this.members = org.members || [];
@@ -95,16 +92,10 @@ export class ManageOrganizationComponent implements OnInit {
   }
 
   saveOrganizationName() {
-    if (!this.newOrganizationName.trim()) return;
+    if (!this.newOrganizationName.trim() || !this.organizationId) return;
 
-    const headers = this.getAuthHeaders();
-
-    this.http
-      .put(
-        `http://localhost:8080/api/organizations/${this.organizationId}`,
-        { name: this.newOrganizationName },
-        { headers },
-      )
+    this.organizationService
+      .updateOrganizationName(this.organizationId, this.newOrganizationName)
       .subscribe({
         next: () => {
           this.organizationName = this.newOrganizationName;
@@ -130,16 +121,10 @@ export class ManageOrganizationComponent implements OnInit {
   }
 
   sendInvitation() {
-    if (!this.inviteEmail.trim()) return;
+    if (!this.inviteEmail.trim() || !this.organizationId) return;
 
-    const headers = this.getAuthHeaders();
-
-    this.http
-      .post(
-        `http://localhost:8080/api/organizations/${this.organizationId}/invite`,
-        { email: this.inviteEmail },
-        { headers },
-      )
+    this.organizationService
+      .sendInvitation(this.organizationId, this.inviteEmail)
       .subscribe({
         next: () => {
           alert('Invitation sent successfully!');
@@ -153,14 +138,10 @@ export class ManageOrganizationComponent implements OnInit {
   }
 
   promoteToAdmin(memberId: number) {
-    const headers = this.getAuthHeaders();
+    if (!this.organizationId) return;
 
-    this.http
-      .post(
-        `http://localhost:8080/api/organizations/${this.organizationId}/promote`,
-        { userId: memberId },
-        { headers },
-      )
+    this.organizationService
+      .promoteToAdmin(this.organizationId, memberId)
       .subscribe({
         next: () => {
           alert('Member promoted to admin successfully!');
@@ -174,20 +155,16 @@ export class ManageOrganizationComponent implements OnInit {
   }
 
   demoteFromAdmin(memberId: number) {
-    const headers = this.getAuthHeaders();
+    if (!this.organizationId) return;
 
-    this.http
-      .post(
-        `http://localhost:8080/api/organizations/${this.organizationId}/demote`,
-        { userId: memberId },
-        { headers },
-      )
+    this.organizationService
+      .demoteFromAdmin(this.organizationId, memberId)
       .subscribe({
         next: () => {
           alert('Admin privileges removed successfully!');
           this.loadOrganizationDetails();
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Failed to demote member:', error);
           alert('Failed to remove admin privileges.');
         },
@@ -195,21 +172,20 @@ export class ManageOrganizationComponent implements OnInit {
   }
 
   removeMember(memberId: number) {
-    if (!confirm('Are you sure you want to remove this member?')) return;
+    if (
+      !confirm('Are you sure you want to remove this member?') ||
+      !this.organizationId
+    )
+      return;
 
-    const headers = this.getAuthHeaders();
-
-    this.http
-      .delete(
-        `http://localhost:8080/api/organizations/${this.organizationId}/members/${memberId}`,
-        { headers },
-      )
+    this.organizationService
+      .removeMember(this.organizationId, memberId)
       .subscribe({
         next: () => {
           alert('Member removed successfully!');
           this.loadOrganizationDetails();
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Failed to remove member:', error);
           alert('Failed to remove member.');
         },
@@ -225,35 +201,19 @@ export class ManageOrganizationComponent implements OnInit {
   }
 
   deleteOrganization() {
-    const headers = this.getAuthHeaders();
+    if (!this.organizationId) return;
 
-    this.http
-      .delete(
-        `http://localhost:8080/api/organizations/${this.organizationId}`,
-        { headers },
-      )
-      .subscribe({
-        next: () => {
-          alert('Organization deleted successfully!');
-          this.showDeleteConfirmation = false;
-          window.location.reload(); // Refresh to update state
-        },
-        error: (error) => {
-          console.error('Failed to delete organization:', error);
-          alert('Failed to delete organization.');
-          this.showDeleteConfirmation = false;
-        },
-      });
-  }
-
-  checkoutToOrganization() {
-    console.log('checkoutToOrganization()');
-  }
-
-  private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
-    return new HttpHeaders({
-      Authorization: `Bearer ${token}`,
+    this.organizationService.deleteOrganization(this.organizationId).subscribe({
+      next: () => {
+        alert('Organization deleted successfully!');
+        this.showDeleteConfirmation = false;
+        window.location.reload(); // Refresh to update state
+      },
+      error: (error: any) => {
+        console.error('Failed to delete organization:', error);
+        alert('Failed to delete organization.');
+        this.showDeleteConfirmation = false;
+      },
     });
   }
 }
