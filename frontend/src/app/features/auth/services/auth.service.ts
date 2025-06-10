@@ -51,7 +51,17 @@ export class AuthService {
 
   getUserStatus(): Observable<UserStatus> {
     const headers = this.getAuthHeaders();
-    return this.http.get<UserStatus>(`${this.apiUrl}/status`, { headers });
+    return this.http.get<UserStatus>(`${this.apiUrl}/status`, { headers }).pipe(
+      catchError((error: any) => {
+        if (error.status === 401) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('userPicture');
+          localStorage.removeItem('userName');
+          this.authState.next(false);
+        }
+        throw error;
+      }),
+    );
   }
 
   isLoggedIn(): boolean {

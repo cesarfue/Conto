@@ -4,32 +4,37 @@ import { AuthService } from '../../features/auth/services/auth.service';
 import { map, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
-export const authGuard = () => {
-  const router = inject(Router);
-
-  if (!isLoggedIn()) {
-    return router.parseUrl('/auth');
-  }
-  return true;
-};
-
-export const loginGuard = () => {
-  const router = inject(Router);
-
-  if (isLoggedIn()) {
-    return router.parseUrl('/dashboard');
-  }
-
-  return true;
-};
-
 enum RoutePaths {
   AUTH = '/auth',
   DASHBOARD = '/dashboard',
   JOIN_OR_CREATE_ORG = '/join-or-create-organization',
 }
 
-const createOrganizationStatusGuard = (
+function isAuth(): boolean {
+  return !!localStorage.getItem('token');
+}
+
+const authGuard = (shouldBeAuthenticated: boolean, redirectPath: string) => {
+  return () => {
+    const router = inject(Router);
+    const userIsAuth = isAuth();
+    console.log(
+      shouldBeAuthenticated ? 'requiresAuthGuard' : 'requiresNoAuthGuard',
+    );
+
+    if (userIsAuth === shouldBeAuthenticated) {
+      return true;
+    } else {
+      return router.parseUrl(redirectPath);
+    }
+  };
+};
+
+export const requiresAuthGuard = authGuard(true, RoutePaths.AUTH);
+
+export const requiresNoAuthGuard = authGuard(false, RoutePaths.DASHBOARD);
+
+const organizationGuard = (
   shouldHaveOrganization: boolean,
   redirectPath: string,
 ) => {
@@ -37,13 +42,10 @@ const createOrganizationStatusGuard = (
     const router = inject(Router);
     const authService = inject(AuthService);
 
-    if (!isLoggedIn()) {
-      return router.parseUrl(RoutePaths.AUTH);
-    }
-
     return authService.getUserStatus().pipe(
       map((response) => {
         const hasOrganization = response.hasOrganization;
+        console.log('hasOrganization  = ', hasOrganization);
 
         if (hasOrganization === shouldHaveOrganization) {
           return true;
@@ -59,16 +61,12 @@ const createOrganizationStatusGuard = (
   };
 };
 
-export const requiresOrganizationGuard = createOrganizationStatusGuard(
+export const requiresOrganizationGuard = organizationGuard(
   true,
   RoutePaths.JOIN_OR_CREATE_ORG,
 );
 
-export const requiresNoOrganizationGuard = createOrganizationStatusGuard(
+export const requiresNoOrganizationGuard = organizationGuard(
   false,
   RoutePaths.DASHBOARD,
 );
-
-function isLoggedIn(): boolean {
-  return !!localStorage.getItem('token');
-}

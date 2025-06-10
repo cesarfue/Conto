@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
 import { AuthComponent } from './features/auth/components/auth.component';
 import {
-  authGuard,
-  loginGuard,
+  requiresAuthGuard,
+  requiresNoAuthGuard,
   requiresOrganizationGuard,
   requiresNoOrganizationGuard,
 } from './core/guards/auth.guard';
@@ -18,7 +18,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
-    canActivate: [authGuard, requiresOrganizationGuard],
+    canActivate: [requiresAuthGuard, requiresOrganizationGuard],
   },
   {
     path: 'manage-organization',
@@ -30,11 +30,12 @@ export const routes: Routes = [
       import(
         './shared/components/join-or-create-organization/join-or-create-organization.component'
       ).then((m) => m.JoinOrCreateOrganizationComponent),
-    canActivate: [loginGuard, requiresNoOrganizationGuard],
+    canActivate: [requiresAuthGuard, requiresNoOrganizationGuard],
   },
   {
     path: 'auth',
     component: AuthComponent,
+    canActivate: [requiresNoAuthGuard],
   },
   {
     path: '**',
