@@ -46,7 +46,12 @@ public class OrganizationController {
     organization.setName(name);
     organization = organizationRepository.save(organization);
 
-    // Create UserOrganization relationship with ADMIN role
+    // Set current organization to false for all user's organizations
+    List<UserOrganization> userOrgs = userOrganizationRepository.findByUser(user);
+    userOrgs.forEach(uo -> uo.setCurrentOrganization(false));
+    userOrganizationRepository.saveAll(userOrgs);
+
+    // Create UserOrganization relationship with admin role
     UserOrganization userOrg = new UserOrganization(user, organization, UserOrganization.UserRole.ADMIN);
     userOrg.setCurrentOrganization(true);
     userOrganizationRepository.save(userOrg);
@@ -84,7 +89,7 @@ public class OrganizationController {
       userOrgs.forEach(uo -> uo.setCurrentOrganization(false));
       userOrganizationRepository.saveAll(userOrgs);
 
-      // Create new UserOrganization relationship
+      // Create UserOrganization relationship
       UserOrganization userOrg = new UserOrganization(user, organization, UserOrganization.UserRole.MEMBER);
       userOrg.setCurrentOrganization(true);
       userOrganizationRepository.save(userOrg);

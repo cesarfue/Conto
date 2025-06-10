@@ -23,7 +23,7 @@ public class UserOrganization {
   @Column(nullable = false)
   private UserRole role = UserRole.MEMBER;
 
-  @Column(name = "is_current_organization")
+  @Column(name = "is_current_organization", columnDefinition = "BOOLEAN DEFAULT FALSE")
   private boolean isCurrentOrganization = false;
 
   @Column(name = "joined_date")
