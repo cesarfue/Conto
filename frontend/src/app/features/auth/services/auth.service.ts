@@ -4,19 +4,6 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
-interface UserStatus {
-  hasOrganization: boolean;
-  email: string;
-  currentOrganizationId: number | null;
-  currentOrganizationName: string | null;
-  organizations: Array<{
-    id: number;
-    name: string;
-    role: string;
-    isCurrent: boolean;
-  }>;
-}
-
 declare var google: any;
 
 @Injectable({ providedIn: 'root' })
@@ -55,21 +42,6 @@ export class AuthService {
     );
   }
 
-  getUserStatus(): Observable<UserStatus> {
-    const headers = this.getAuthHeaders();
-    return this.http.get<UserStatus>(`${this.apiUrl}/status`, { headers }).pipe(
-      catchError((error: any) => {
-        if (error.status === 401) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('userPicture');
-          localStorage.removeItem('userName');
-          this.authState.next(false);
-        }
-        throw error;
-      }),
-    );
-  }
-
   isLoggedIn(): boolean {
     return !!localStorage.getItem('token');
   }
@@ -97,13 +69,8 @@ export class AuthService {
       google.accounts.id.disableAutoSelect();
     }
 
-    // Clear all localStorage data
-    localStorage.removeItem('token');
-    localStorage.removeItem('userPicture');
-    localStorage.removeItem('userName');
-
-    // Update auth state
-    this.authState.next(false);
+    // Clear all auth data
+    this.clearAuthData();
 
     // Call backend logout endpoint
     return this.http.post(`${this.apiUrl}/logout`, {}).pipe(
@@ -116,6 +83,13 @@ export class AuthService {
         window.location.href = '/auth';
       }),
     );
+  }
+
+  clearAuthData(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userPicture');
+    localStorage.removeItem('userName');
+    this.authState.next(false);
   }
 
   getAuthHeaders(): HttpHeaders {

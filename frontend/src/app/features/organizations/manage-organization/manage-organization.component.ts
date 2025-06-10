@@ -1,10 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-// import { UserService } from '../../../shared/services/user.service';
-import { AuthService } from '../../auth/services/auth.service';
 import { OrganizationService } from '../../../shared/services/organization.service';
 import { JoinOrCreateOrganizationComponent } from '../../../shared/components/join-or-create-organization/join-or-create-organization.component';
+import { UserService } from '../../../shared/services/user.service';
 
 interface Member {
   id: number;
@@ -33,18 +32,15 @@ export class ManageOrganizationComponent implements OnInit {
   currentUserId: number | null = null;
   showDeleteConfirmation = false;
 
-  constructor(
-    // private userService: UserService,
-    private organizationService: OrganizationService,
-    private authService: AuthService,
-  ) {}
+  private organizationService = inject(OrganizationService);
+  private userService = inject(UserService);
 
   ngOnInit() {
     this.loadUserStatus();
   }
 
   private loadUserStatus() {
-    this.authService.getUserStatus().subscribe({
+    this.userService.getUserStatus().subscribe({
       next: (status) => {
         this.hasOrganization = status.hasOrganization;
         this.organizationName = status.currentOrganizationName;
@@ -55,7 +51,7 @@ export class ManageOrganizationComponent implements OnInit {
           this.loadOrganizationDetails();
         }
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Failed to load user status:', error);
         this.isLoading = false;
       },

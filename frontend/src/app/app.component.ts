@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { AuthService } from './features/auth/services/auth.service';
+import { UserService } from './shared/services/user.service';
 import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 import { RouterOutlet } from '@angular/router';
 
@@ -15,7 +16,8 @@ export class AppComponent implements OnInit {
   hasOrganization = false;
   showSidebar = false;
 
-  constructor(private authService: AuthService) {}
+  private authService = inject(AuthService);
+  private userService = inject(UserService);
 
   ngOnInit() {
     this.isLoggedIn = this.authService.isLoggedIn();
@@ -31,7 +33,7 @@ export class AppComponent implements OnInit {
   }
 
   private checkOrganizationStatus() {
-    this.authService.getUserStatus().subscribe({
+    this.userService.getUserStatus().subscribe({
       next: (status) => {
         this.hasOrganization = status.hasOrganization;
         this.checkSidebarVisibility();

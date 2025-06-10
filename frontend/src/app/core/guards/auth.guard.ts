@@ -1,8 +1,7 @@
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../features/auth/services/auth.service';
 import { map, catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { UserService } from '../../shared/services/user.service';
 
 enum RoutePaths {
   AUTH = '/auth',
@@ -37,9 +36,9 @@ const organizationGuard = (
 ) => {
   return () => {
     const router = inject(Router);
-    const authService = inject(AuthService);
+    const userService = inject(UserService);
 
-    return authService.getUserStatus().pipe(
+    return userService.getUserStatus().pipe(
       map((response) => {
         const hasOrganization = response.hasOrganization;
 

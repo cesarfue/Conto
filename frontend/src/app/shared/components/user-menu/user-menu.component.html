@@ -20,7 +20,7 @@
         <li><a (click)="signOut()">Sign Out</a></li>
         <div class="menu-separator"></div>
       @for (organization of organizations; track organization) {
-          <li><a (click)="checkoutToOrganization()">{{organization.name}}</a></li>
+          <li><a (click)="checkoutToOrganization(organization.id)">{{organization.name}}</a></li>
         }
 
       </ul>

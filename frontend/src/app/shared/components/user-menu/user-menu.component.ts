@@ -1,7 +1,13 @@
-import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
-import { GoogleAuthService } from '../../../features/auth/services/google-auth.service';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { AuthService } from '../../../features/auth/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-user-menu',
@@ -28,23 +34,21 @@ export class UserMenuComponent implements OnInit {
     return localStorage.getItem('userName') || 'User';
   }
 
-  constructor(
-    private googleAuthService: GoogleAuthService,
-    private authService: AuthService,
-    public elementRef: ElementRef,
-  ) {}
+  private authService = inject(AuthService);
+  private userService = inject(UserService);
+  private elementRef = inject(ElementRef);
 
   ngOnInit() {
     this.loadUserStatus();
   }
 
   private loadUserStatus() {
-    this.authService.getUserStatus().subscribe({
+    this.userService.getUserStatus().subscribe({
       next: (status) => {
         this.organizations = status.organizations || [];
         this.currentOrganizationName = status.currentOrganizationName || null;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Failed to load user status:', error);
         this.isLoadingOrganization = false;
       },
@@ -67,7 +71,7 @@ export class UserMenuComponent implements OnInit {
     this.authService.logout().subscribe();
   }
 
-  checkoutToOrganization() {
+  checkoutToOrganization(id: number) {
     console.log('checkoutToOrganization()');
   }
 
