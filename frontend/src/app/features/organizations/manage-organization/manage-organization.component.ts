@@ -47,8 +47,8 @@ export class ManageOrganizationComponent implements OnInit {
     this.authService.getUserStatus().subscribe({
       next: (status) => {
         this.hasOrganization = status.hasOrganization;
-        this.organizationName = status.organizationName;
-        this.organizationId = status.organizationId;
+        this.organizationName = status.currentOrganizationName;
+        this.organizationId = status.currentOrganizationId;
         this.isLoading = false;
 
         if (this.hasOrganization && this.organizationId) {
@@ -244,6 +244,10 @@ export class ManageOrganizationComponent implements OnInit {
           this.showDeleteConfirmation = false;
         },
       });
+  }
+
+  checkoutToOrganization() {
+    console.log('checkoutToOrganization()');
   }
 
   private getAuthHeaders(): HttpHeaders {

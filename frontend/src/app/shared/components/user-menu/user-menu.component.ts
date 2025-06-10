@@ -11,7 +11,13 @@ import { CommonModule } from '@angular/common';
 })
 export class UserMenuComponent implements OnInit {
   isUserMenuOpen = false;
-  organizationName: string | null = null;
+  organizations: Array<{
+    id: number;
+    name: string;
+    role: string;
+    isCurrent: boolean;
+  }> | null = null;
+  currentOrganizationName: string | null = null;
   isLoadingOrganization = true;
 
   get userPicture(): string | null {
@@ -35,8 +41,8 @@ export class UserMenuComponent implements OnInit {
   private loadUserStatus() {
     this.authService.getUserStatus().subscribe({
       next: (status) => {
-        this.organizationName = status.organizationName;
-        this.isLoadingOrganization = false;
+        this.organizations = status.organizations || [];
+        this.currentOrganizationName = status.currentOrganizationName || null;
       },
       error: (error) => {
         console.error('Failed to load user status:', error);
@@ -59,6 +65,10 @@ export class UserMenuComponent implements OnInit {
 
   signOut() {
     this.authService.logout().subscribe();
+  }
+
+  checkoutToOrganization() {
+    console.log('checkoutToOrganization()');
   }
 
   @HostListener('document:click', ['$event'])

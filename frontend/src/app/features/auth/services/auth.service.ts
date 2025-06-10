@@ -7,8 +7,14 @@ import { of } from 'rxjs';
 interface UserStatus {
   hasOrganization: boolean;
   email: string;
-  organizationId: number | null;
-  organizationName: string | null;
+  currentOrganizationId: number | null;
+  currentOrganizationName: string | null;
+  organizations: Array<{
+    id: number;
+    name: string;
+    role: string;
+    isCurrent: boolean;
+  }>;
 }
 
 declare var google: any;

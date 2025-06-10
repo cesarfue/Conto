@@ -20,7 +20,10 @@ import com.example.backend.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -102,35 +105,34 @@ public class AuthController {
 
   @GetMapping("/status")
   public ResponseEntity<?> getUserStatus(@RequestHeader("Authorization") String authHeader) {
-    try {
-      String token = authHeader.replace("Bearer ", "");
-      String email = jwtService.extractSubject(token);
+    String token = authHeader.replace("Bearer ", "");
+    String email = jwtService.extractSubject(token);
 
-      User user = userRepository.findByEmail(email)
-          .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
 
-      // Use the new convenience methods
-      boolean hasOrganization = user.hasOrganization();
-      String userEmail = user.getEmail() != null ? user.getEmail() : "unknown";
+    Map<String, Object> response = new HashMap<>();
+    response.put("email", user.getEmail());
+    response.put("hasOrganization", user.hasOrganization());
 
-      Map<String, Object> response = new HashMap<>();
-      response.put("hasOrganization", hasOrganization);
-      response.put("email", userEmail);
+    // Get current organization
+    Organization currentOrg = user.getCurrentOrganization();
+    response.put("currentOrganizationId", currentOrg != null ? currentOrg.getId() : null);
+    response.put("currentOrganizationName", currentOrg != null ? currentOrg.getName() : null);
 
-      if (hasOrganization) {
-        Organization currentOrg = user.getCurrentOrganization();
-        response.put("organizationId", currentOrg.getId());
-        response.put("organizationName", currentOrg.getName());
-      } else {
-        response.put("organizationId", null);
-        response.put("organizationName", null);
-      }
+    // Get all organizations
+    List<Map<String, Object>> organizations = user.getUserOrganizations().stream()
+        .map(uo -> {
+          Map<String, Object> org = new HashMap<>();
+          org.put("id", uo.getOrganization().getId());
+          org.put("name", uo.getOrganization().getName());
+          org.put("role", uo.getRole().toString());
+          org.put("isCurrent", uo.isCurrentOrganization());
+          return org;
+        })
+        .collect(Collectors.toList());
 
-      return ResponseEntity.ok(response);
-
-    } catch (Exception e) {
-      System.err.println("Error in getUserStatus: " + e.getMessage());
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error getting user status");
-    }
+    response.put("organizations", organizations);
+    return ResponseEntity.ok(response);
   }
 }

@@ -43,6 +43,11 @@
   }
 }
 
+.menu-separator {
+  border-top: 1px solid #e0e0e0;
+  // margin: 8px 0;
+}
+
 .user-dropdown {
   position: absolute;
   left: 0;
@@ -54,33 +59,22 @@
   overflow: hidden;
 
   ul {
-    list-style: none;
     padding: 0;
     margin: 0;
 
-    a {
+    li {
       display: flex;
       align-items: center;
       padding: 0.75rem 1rem;
       color: #333;
-      text-decoration: none;
       cursor: pointer;
       transition: background-color 0.2s;
 
-      .menu-icon {
-        margin-right: 10px;
-        width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
       }
     }
 
-    &:hover {
-      background-color: #f5f7ff;
-      color: #4a6bff;
-    }
   }
 }
 

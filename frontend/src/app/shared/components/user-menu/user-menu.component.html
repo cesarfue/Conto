@@ -9,7 +9,7 @@
     }
     <div class="user-info">
       <div class="user-name">{{ userName }}</div>
-      <div class="organization-name">{{ organizationName }}</div>
+      <div class="organization-name">{{ currentOrganizationName }}</div>
     </div>
     <i class="dropdown-icon">▼</i>
   </button>
@@ -18,6 +18,11 @@
     <div class="user-dropdown">
       <ul>
         <li><a (click)="signOut()">Sign Out</a></li>
+        <div class="menu-separator"></div>
+      @for (organization of organizations; track organization) {
+          <li><a (click)="checkoutToOrganization()">{{organization.name}}</a></li>
+        }
+
       </ul>
     </div>
   }
