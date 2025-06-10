@@ -130,7 +130,6 @@ public class AuthController {
 
     } catch (Exception e) {
       System.err.println("Error in getUserStatus: " + e.getMessage());
-      e.printStackTrace();
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error getting user status");
     }
   }
