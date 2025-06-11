@@ -107,14 +107,12 @@ public class OrganizationController {
 
     User user = getUserFromToken(authHeader);
 
-    // Check if user belongs to this organization
     UserOrganization userOrg = userOrganizationRepository.findByUserAndOrganization(user,
         organizationRepository.findById(id).orElseThrow())
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied to this organization"));
 
     Organization organization = userOrg.getOrganization();
 
-    // Get all members of the organization
     List<UserOrganization> memberOrgs = userOrganizationRepository.findByOrganization(organization);
 
     List<Map<String, Object>> memberData = memberOrgs.stream()
@@ -312,7 +310,6 @@ public class OrganizationController {
     Organization organization = organizationRepository.findById(id)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found"));
 
-    // Check if current user is admin
     UserOrganization currentUserOrg = userOrganizationRepository.findByUserAndOrganization(currentUser, organization)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a member"));
 
@@ -320,14 +317,39 @@ public class OrganizationController {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can delete organization");
     }
 
-    // Remove all UserOrganization relationships first
     List<UserOrganization> memberOrgs = userOrganizationRepository.findByOrganization(organization);
     userOrganizationRepository.deleteAll(memberOrgs);
 
-    // Delete the organization
     organizationRepository.delete(organization);
 
     return ResponseEntity.ok(Map.of("message", "Organization deleted successfully"));
+  }
+
+  @PostMapping("/{id}/switch")
+  public ResponseEntity<?> switchToOrganization(
+      @RequestHeader("Authorization") String authHeader,
+      @PathVariable Long id) {
+
+    User user = getUserFromToken(authHeader);
+
+    Organization targetOrganization = organizationRepository.findById(id)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found"));
+
+    UserOrganization targetUserOrg = userOrganizationRepository.findByUserAndOrganization(user, targetOrganization)
+        .orElseThrow(
+            () -> new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not a member of this organization"));
+
+    List<UserOrganization> userOrgs = userOrganizationRepository.findByUser(user);
+    userOrgs.forEach(uo -> uo.setCurrentOrganization(false));
+    userOrganizationRepository.saveAll(userOrgs);
+
+    targetUserOrg.setCurrentOrganization(true);
+    userOrganizationRepository.save(targetUserOrg);
+
+    return ResponseEntity.ok(Map.of(
+        "message", "Switched organization successfully",
+        "currentOrganizationId", targetOrganization.getId(),
+        "currentOrganizationName", targetOrganization.getName()));
   }
 
   private User getUserFromToken(String authHeader) {

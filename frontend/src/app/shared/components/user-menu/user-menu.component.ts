@@ -8,6 +8,7 @@ import {
 import { AuthService } from '../../../features/auth/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../services/user.service';
+import { OrganizationService } from '../../services/organization.service';
 
 @Component({
   selector: 'app-user-menu',
@@ -37,6 +38,7 @@ export class UserMenuComponent implements OnInit {
   private authService = inject(AuthService);
   private userService = inject(UserService);
   private elementRef = inject(ElementRef);
+  private organizationService = inject(OrganizationService);
 
   ngOnInit() {
     this.loadUserStatus();
@@ -73,6 +75,7 @@ export class UserMenuComponent implements OnInit {
 
   checkoutToOrganization(id: number) {
     console.log('checkoutToOrganization()');
+    this.organizationService.switchToOrganization(id);
   }
 
   @HostListener('document:click', ['$event'])

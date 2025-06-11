@@ -15,10 +15,8 @@ export class TransactionService {
   }
 
   private loadTransactionsFromBackend(): void {
-    const headers = this.getAuthHeaders();
-
     this.http
-      .get<Transaction[]>('http://localhost:8080/api/transactions', { headers })
+      .get<Transaction[]>('http://localhost:8080/api/transactions')
       .subscribe({
         next: (transactions) => {
           const processedTransactions = transactions.map((t) => ({
@@ -30,14 +28,11 @@ export class TransactionService {
         },
         error: (error) => {
           console.error('Failed to load transactions from backend:', error);
-          //this.loadFromLocalStorage();
         },
       });
   }
 
   addTransaction(transaction: Transaction): void {
-    const headers = this.getAuthHeaders();
-
     const transactionData = {
       date: transaction.date.toISOString().split('T')[0], // Convert to YYYY-MM-DD format
       amount: transaction.amount,
@@ -50,7 +45,6 @@ export class TransactionService {
       .post<Transaction>(
         'http://localhost:8080/api/transactions',
         transactionData,
-        { headers },
       )
       .subscribe({
         next: (savedTransaction) => {
@@ -70,9 +64,7 @@ export class TransactionService {
   }
 
   deleteTransaction(id: string | number): void {
-    const headers = this.getAuthHeaders();
-
-    this.http.delete(`/api/transactions/${id}`, { headers }).subscribe({
+    this.http.delete(`/api/transactions/${id}`).subscribe({
       next: () => {
         const currentTransactions = this.transactionsSubject.getValue();
         const updatedTransactions = currentTransactions.filter(
@@ -88,16 +80,12 @@ export class TransactionService {
   }
 
   deleteMultipleTransactions(ids: (string | number)[]): void {
-    const headers = this.getAuthHeaders();
-
     this.http
       .delete('/api/transactions/batch', {
-        headers,
         body: { ids: ids },
       })
       .subscribe({
         next: () => {
-          // Remove from local state after successful backend deletion
           const currentTransactions = this.transactionsSubject.getValue();
           const updatedTransactions = currentTransactions.filter(
             (transaction) => !ids.includes(transaction.id),
@@ -112,8 +100,6 @@ export class TransactionService {
   }
 
   updateTransaction(updatedTransaction: Transaction): void {
-    const headers = this.getAuthHeaders();
-
     const transactionData = {
       date: updatedTransaction.date.toISOString().split('T')[0],
       amount: updatedTransaction.amount,
@@ -126,11 +112,9 @@ export class TransactionService {
       .put<Transaction>(
         `/api/transactions/${updatedTransaction.id}`,
         transactionData,
-        { headers },
       )
       .subscribe({
         next: (savedTransaction) => {
-          // Update local state with backend response
           const currentTransactions = this.transactionsSubject.getValue();
           const updatedTransactions = currentTransactions.map((transaction) =>
             transaction.id === savedTransaction.id
@@ -151,14 +135,6 @@ export class TransactionService {
       'transactions',
       JSON.stringify(this.transactionsSubject.getValue()),
     );
-  }
-
-  private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
-    console.log('Token from localStorage: ', token);
-    return new HttpHeaders({
-      Authorization: `Bearer ${token}`,
-    });
   }
 
   getTransaction(id: string | number): Transaction | null {
