@@ -59,14 +59,6 @@ export class UserMenuComponent implements OnInit {
     });
   }
 
-  hideUserMenu() {
-    this.isUserMenuOpen = false;
-  }
-
-  showUserMenu() {
-    this.isUserMenuOpen = true;
-  }
-
   toggleUserMenu() {
     this.isUserMenuOpen = !this.isUserMenuOpen;
   }

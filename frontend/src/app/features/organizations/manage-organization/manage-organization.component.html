@@ -1,13 +1,4 @@
 <div class="manage-organization-container">
-    <!-- Current Organization Panel -->
-    <div class="organization-panel">
-      <div class="panel-header">
-        <h2>Current Organization</h2>
-        @if (isLoading) {
-          <div class="loading-spinner">Loading...</div>
-        }
-      </div>
-
       @if (!isLoading && hasOrganization) {
         <div class="organization-info">
           <div class="org-name-section">

@@ -12,7 +12,7 @@
 
 .transactions-grid {
   display: grid;
-  grid-template-columns: 40px 120px minmax(100px, 200px) minmax(0, 1fr) 100px 100px;
+  grid-template-columns: 120px minmax(100px, 200px) minmax(100px, 200px) minmax(0, 1fr) 100px 100px 30px;
   gap: 0;
   background: white;
   border-radius: 4px;
@@ -31,12 +31,6 @@
   border-right: 1px solid #e9ecef;
 }
 
-.checkbox-col {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .grid-cell {
   padding: 12px 8px;
   border-bottom: 1px solid #f1f3f4;
@@ -44,12 +38,6 @@
   display: flex;
   align-items: center;
   font-size: 14px;
-}
-
-.transaction-checkbox {
-  margin: 12px auto;
-  border-right: 1px solid #f1f3f4;
-  // justify-self: center;
 }
 
 .amount-cell {
@@ -106,7 +94,7 @@
 }
 
 .form-actions {
-  grid-column: 1 / -1; // Span across all columns
+  grid-column: 1 / -1;
   display: flex;
   justify-content: flex-end;
   gap: 8px;
@@ -144,51 +132,55 @@
   }
 }
 
-.transactions-grid>.transaction-checkbox:hover,
 .transactions-grid>.grid-cell:hover {
   background-color: #f8f9fa;
 }
 
-.selected-transactions {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  overflow: hidden;
-}
-
-.selected-count {
-  padding: 12px 16px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #495057;
-  background: white;
-  border-right: 1px solid #dee2e6;
-}
-
-.delete-btn {
-  padding: 12px 16px;
-  background: #dc3545;
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-
-  &:hover {
-    background: #c82333;
-  }
-}
-
-
 @media (min-width: 992px) {
   .dashboard-content {
     grid-template-columns: 2fr 1fr;
+  }
+}
+
+.transaction-dropdown {
+  position: fixed;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 140px;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #333;
+
+      &:hover {
+        background-color: #f8f9fa;
+      }
+
+      &.delete-option {
+        color: #dc3545;
+
+        &:hover {
+          background-color: #fdf2f2;
+        }
+      }
+
+      i {
+        width: 16px;
+        font-size: 12px;
+      }
+    }
   }
 }

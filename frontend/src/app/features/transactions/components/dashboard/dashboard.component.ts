@@ -8,7 +8,11 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { Transaction, CATEGORIES } from '../../models/transactions.model';
+import {
+  Transaction,
+  CATEGORIES,
+  ACTIONS,
+} from '../../models/transactions.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,11 +26,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   transactions: Transaction[] = [];
   showAddForm = false;
-  selectedTransactions: Set<string | number> = new Set();
   transactionForm: FormGroup;
   editingTransaction: Transaction | null = null;
   editForm: FormGroup;
   categories = CATEGORIES;
+  actions = ACTIONS;
+  activeMenuTransactionId: string | number | null = null;
+
+  menuPosition = { x: 0, y: 0 };
 
   constructor(
     private fb: FormBuilder,
@@ -48,6 +55,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
+  // Add transaction methods
+
   onAddTransaction(): void {
     this.initializeEmptyForm();
     this.showAddForm = true;
@@ -67,20 +76,37 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.showAddForm = false;
   }
 
-  onSelectionChange(transactionId: string | number, event: any): void {
-    if (event.target.checked) {
-      this.selectedTransactions.add(transactionId);
+  // Transaction Menu Methods
+
+  toggleTransactionMenu(
+    event: MouseEvent,
+    transactionId: string | number,
+    buttonElement: HTMLElement,
+  ): void {
+    event.stopPropagation();
+
+    if (this.activeMenuTransactionId === transactionId) {
+      this.activeMenuTransactionId = null;
     } else {
-      this.selectedTransactions.delete(transactionId);
+      this.activeMenuTransactionId = transactionId;
+
+      const rect = buttonElement.getBoundingClientRect();
+      this.menuPosition = {
+        x: rect.right - 140,
+        y: rect.bottom + 4,
+      };
     }
   }
 
-  deleteSelected(): void {
-    if (this.selectedTransactions.size === 0) return;
-    const idsToDelete = Array.from(this.selectedTransactions);
-    this.transactionService.deleteMultipleTransactions(idsToDelete);
-    this.selectedTransactions.clear();
-    console.log(`Deleted ${idsToDelete.length} transactions`);
+  getTransactionById(id: string | number): Transaction {
+    return this.transactions.find((t) => t.id === id)!;
+  }
+
+  deleteTransaction(transactionId: string | number): void {
+    if (confirm('Are you sure you want to delete this transaction?')) {
+      this.transactionService.deleteTransaction(transactionId);
+    }
+    this.activeMenuTransactionId = null;
   }
 
   private saveForm(): boolean {
@@ -93,6 +119,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const transactionData: Transaction = {
         date: new Date(formData.date),
         category: formData.category,
+        action: formData.action,
         memo: formData.memo,
         amount: amount,
         id: Date.now().toString(),
@@ -116,6 +143,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.transactionForm = this.fb.group({
       date: [new Date().toISOString().split('T')[0], Validators.required],
       category: ['', Validators.required],
+      action: [''],
       memo: [''],
       outflow: [''],
       inflow: [''],
@@ -126,6 +154,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (event) {
       event.stopPropagation();
     }
+    this.activeMenuTransactionId = null;
     this.editingTransaction = transaction;
     this.editForm = this.fb.group({
       date: [
@@ -133,6 +162,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         Validators.required,
       ],
       category: [transaction.category, Validators.required],
+      action: [transaction.action],
       memo: [transaction.memo],
       outflow: [transaction.amount < 0 ? Math.abs(transaction.amount) : ''],
       inflow: [transaction.amount > 0 ? transaction.amount : ''],
@@ -157,6 +187,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         ...this.editingTransaction,
         date: new Date(formData.date),
         category: formData.category,
+        action: formData.action,
         memo: formData.memo,
         amount: amount,
       };
@@ -169,13 +200,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
     if (this.editingTransaction) {
-      const target = event.target as HTMLElement;
       const editForm = target.closest('.edit-form-grid');
 
       if (!editForm) {
         this.saveEdit();
       }
+    }
+    if (
+      !target.closest('.dots-cell') &&
+      !target.closest('.transaction-dropdown')
+    ) {
+      this.activeMenuTransactionId = null;
     }
   }
 }

@@ -2,7 +2,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OrganizationService } from '../../../shared/services/organization.service';
-import { JoinOrCreateOrganizationComponent } from '../../../shared/components/join-or-create-organization/join-or-create-organization.component';
 import { UserService } from '../../../shared/services/user.service';
 
 interface Member {
@@ -13,7 +12,7 @@ interface Member {
 
 @Component({
   selector: 'app-manage-organization',
-  imports: [CommonModule, JoinOrCreateOrganizationComponent, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './manage-organization.component.html',
   styleUrl: './manage-organization.component.scss',
 })

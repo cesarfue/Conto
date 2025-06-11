@@ -3,6 +3,7 @@ export interface Transaction {
   date: Date;
   amount: number;
   category: string;
+  action: string;
   recipient: string;
   memo: string;
 }
@@ -11,6 +12,15 @@ export interface Category {
   id: string;
   name: string;
 }
+
+export interface Action {
+  name: string;
+}
+
+export const ACTIONS: Action[] = [
+  { name: 'Chatoyantes 2025' },
+  { name: 'EFG 2025' },
+];
 
 export const CATEGORIES: Category[] = [
   // CLASSE 6 - CHARGES (Expenses/Outflows)

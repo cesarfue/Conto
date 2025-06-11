@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-join-or-create-organization',
@@ -30,6 +31,7 @@ export class JoinOrCreateOrganizationComponent {
       .subscribe({
         next: () => {
           window.location.reload();
+          router()
         },
         error: (error) => {
           alert('Failed to join organization. Please check your join code.');

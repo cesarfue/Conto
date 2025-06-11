@@ -7,17 +7,17 @@
   </div>
 
   <div class="transactions-grid">
-    <div class="grid-header checkbox-col"></div>
     <div class="grid-header">DATE</div>
     <div class="grid-header">CATEGORY</div>
+    <div class="grid-header">ACTION</div>
     <div class="grid-header">MEMO</div>
     <div class="grid-header">OUTFLOW</div>
     <div class="grid-header">INFLOW</div>
+    <div class="grid-header"></div>
 
     <!-- If "Add Transaction" was clicked : -->
     @if (showAddForm) {
       <div class="inline-form-wrapper" [formGroup]="transactionForm">
-        <input type="checkbox" checked class="transaction-checkbox" />
         <input type="date" formControlName="date" class="grid-input" />
         <select formControlName="category" class="grid-input">
           <option value="">Select category</option>
@@ -26,6 +26,14 @@
               {{ category.name }}
             </option>
           }
+        </select>
+        <select formControlName="action" class="grid-input">
+          <option value="">Select action</option>
+          @for (action of actions; track action) {
+              <option [value]="action.name">
+              {{action.name}}
+              </option>
+            }
         </select>
         <input
           type="text"
@@ -65,12 +73,6 @@
 
     <!--Transaction List -->
     @for (transaction of transactions; track transaction.id) {
-      <input
-        type="checkbox"
-        class="transaction-checkbox"
-        [checked]="selectedTransactions.has(transaction.id)"
-        (change)="onSelectionChange(transaction.id, $event)"
-      />
 
       <!-- Editing view -->
       @if (editingTransaction && editingTransaction.id === transaction.id) {
@@ -89,6 +91,16 @@
             <option value="">Select category</option>
             @for (category of categories; track category) {
               <option [value]="category.name">{{ category.name }}</option>
+            }
+          </select>
+          <select
+            formControlName="action"
+            class="grid-input"
+            (keydown.enter)="saveEdit()"
+          >
+            <option value="">Select action</option>
+            @for (action of actions; track action) {
+              <option [value]="action.name">{{ action.name }}</option>
             }
           </select>
           <input
@@ -112,21 +124,23 @@
             class="grid-input amount-input"
             (keydown.enter)="saveEdit()"
           />
+          <div class="grid-cell"></div>
         </div>
       } @else {
+
         <!--Normal view-->
-        <div class="grid-cell" (click)="startEdit(transaction, $event)">
+        <div class="grid-cell">
           {{ transaction.date | date: "dd/MM/yyyy" }}
         </div>
-        <div class="grid-cell" (click)="startEdit(transaction, $event)">
+        <div class="grid-cell">
           {{ transaction.category }}
         </div>
-        <div class="grid-cell" (click)="startEdit(transaction, $event)">
+        <div class="grid-cell">{{transaction.action}}</div>
+        <div class="grid-cell">
           {{ transaction.memo }}
         </div>
         <div
           class="grid-cell amount-cell"
-          (click)="startEdit(transaction, $event)"
         >
           @if (transaction.amount < 0) {
             {{ -transaction.amount | currency: "EUR" : "symbol" : "1.2-2" }}
@@ -134,30 +148,36 @@
         </div>
         <div
           class="grid-cell amount-cell"
-          (click)="startEdit(transaction, $event)"
         >
           @if (transaction.amount > 0) {
             {{ transaction.amount | currency: "EUR" : "symbol" : "1.2-2" }}
           }
         </div>
+        <div class="grid-cell dots-cell">
+          <button
+            #menuButton
+            class="dots-menu-btn"
+            (click)="toggleTransactionMenu($event, transaction.id, menuButton)">
+            <i class="fa fa-ellipsis-v"></i>
+          </button>
+        </div>
       }
     }
   </div>
 
-  <!--Selected Transactions menu-->
-  @if (selectedTransactions.size >= 1) {
-    <div class="selected-transactions">
-      <span class="selected-count"
-        >{{ selectedTransactions.size }}
-        @if (selectedTransactions.size <= 1) {
-          Transaction
-        } @else {
-          Transactions
-        }
-      </span>
-      <button class="delete-btn" (click)="deleteSelected()">
-        <i class="fa fa-trash"></i>
-      </button>
+  @if (activeMenuTransactionId !== null) {
+    <div
+      class="transaction-dropdown"
+      [style.top.px]="menuPosition.y"
+      [style.left.px]="menuPosition.x">
+      <ul>
+        <li (click)="startEdit(getTransactionById(activeMenuTransactionId), $event)">
+          <i class="fa fa-edit"></i> Edit
+        </li>
+        <li class="delete-option" (click)="deleteTransaction(activeMenuTransactionId)">
+          <i class="fa fa-trash"></i> Delete
+        </li>
+      </ul>
     </div>
   }
 </div>
