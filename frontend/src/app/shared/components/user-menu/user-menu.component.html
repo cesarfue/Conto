@@ -17,12 +17,13 @@
   @if (isUserMenuOpen) {
     <div class="user-dropdown">
       <ul>
-        <li><a (click)="signOut()">Sign Out</a></li>
+        <li (click)="signOut()">Sign Out</li>
         <div class="menu-separator"></div>
       @for (organization of organizations; track organization) {
-          <li><a (click)="checkoutToOrganization(organization.id)">{{organization.name}}</a></li>
+          <li (click)="checkoutToOrganization(organization.id)">{{organization.name}}</li>
         }
-
+        <div class="menu-separator"></div>
+        <li routerLink="/join-or-create-organization">Add Organization</li>
       </ul>
     </div>
   }

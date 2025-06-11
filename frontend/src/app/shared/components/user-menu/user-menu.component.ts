@@ -9,6 +9,7 @@ import { AuthService } from '../../../features/auth/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../services/user.service';
 import { OrganizationService } from '../../services/organization.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-menu',
@@ -39,6 +40,7 @@ export class UserMenuComponent implements OnInit {
   private userService = inject(UserService);
   private elementRef = inject(ElementRef);
   private organizationService = inject(OrganizationService);
+  private router = inject(Router);
 
   ngOnInit() {
     this.loadUserStatus();
@@ -74,8 +76,15 @@ export class UserMenuComponent implements OnInit {
   }
 
   checkoutToOrganization(id: number) {
-    console.log('checkoutToOrganization()');
-    this.organizationService.switchToOrganization(id);
+    this.organizationService.switchToOrganization(id).subscribe({
+      next: (response) => {
+        window.location.reload();
+        // this.router.navigate(['/manage-organization']);
+      },
+      error: (error) => {
+        console.error('Failed to switch organization:', error);
+      },
+    });
   }
 
   @HostListener('document:click', ['$event'])

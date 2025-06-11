@@ -27,7 +27,9 @@ export class UserService {
   getUserStatus(): Observable<UserStatus> {
     return this.http.get<UserStatus>(`${this.apiUrl}/status`, {}).pipe(
       catchError((error) => {
-        if (error.status === 401) {
+        // WARNING: this seems not nice
+        if (error.status === 403) {
+          console.error('clearing auth data');
           this.authService.clearAuthData();
         }
         return throwError(() => error);
