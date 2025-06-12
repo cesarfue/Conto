@@ -31,7 +31,7 @@ export class JoinOrCreateOrganizationComponent {
       .subscribe({
         next: () => {
           window.location.reload();
-          router()
+          // router()
         },
         error: (error) => {
           alert('Failed to join organization. Please check your join code.');

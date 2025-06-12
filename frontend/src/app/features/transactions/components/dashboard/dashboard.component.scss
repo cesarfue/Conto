@@ -12,7 +12,7 @@
 
 .transactions-grid {
   display: grid;
-  grid-template-columns: 120px minmax(100px, 200px) minmax(100px, 200px) minmax(0, 1fr) 100px 100px 30px;
+  grid-template-columns: 120px min(100px, 400px) minmax(0px, 400px) minmax(0px, 400px) minmax(30px, 200px) minmax(30px, 200px) minmax(20px, 30px);
   gap: 0;
   background: white;
   border-radius: 4px;

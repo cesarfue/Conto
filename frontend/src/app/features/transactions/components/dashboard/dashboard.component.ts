@@ -103,9 +103,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   deleteTransaction(transactionId: string | number): void {
-    if (confirm('Are you sure you want to delete this transaction?')) {
-      this.transactionService.deleteTransaction(transactionId);
-    }
+    this.transactionService.deleteTransaction(transactionId);
     this.activeMenuTransactionId = null;
   }
 
