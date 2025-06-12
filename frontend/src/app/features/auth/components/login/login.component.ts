@@ -7,6 +7,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { GoogleAuthService } from '../../services/google-auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -25,6 +26,7 @@ export class LoginComponent implements OnInit {
   private auth = inject(AuthService);
   private googleAuthService = inject(GoogleAuthService);
   private fb = inject(FormBuilder);
+  private router = inject(Router);
 
   constructor() {
     this.loginForm = this.fb.group({
@@ -52,6 +54,7 @@ export class LoginComponent implements OnInit {
       this.auth.login(email, password).subscribe({
         next: () => {
           console.log('Login successful');
+          this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           this.showError = true;

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import {
   FormBuilder,
@@ -24,6 +24,8 @@ export class RegisterComponent {
   showPassword = false;
   showConfirmPassword = false;
 
+  @Output() registrationSuccess = new EventEmitter<void>();
+
   constructor(
     private auth: AuthService,
     private fb: FormBuilder,
@@ -39,7 +41,6 @@ export class RegisterComponent {
     );
   }
 
-  // Custom password validator
   passwordValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.value;
     if (!password) return null;
@@ -65,7 +66,6 @@ export class RegisterComponent {
     return Object.keys(errors).length ? errors : null;
   }
 
-  // Custom validator for password confirmation
   passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
     const password = group.get('password')?.value;
     const confirmPassword = group.get('confirmPassword')?.value;
@@ -100,7 +100,8 @@ export class RegisterComponent {
     this.auth.register(email, password).subscribe({
       next: (response) => {
         console.log('Registration successful');
-        this.router.navigate(['/dashboard']);
+        // this.router.navigate(['/dashboard']);
+        this.registrationSuccess.emit();
       },
       error: (error) => {
         this.isLoading = false;

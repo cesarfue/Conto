@@ -20,6 +20,6 @@
   @if (isLoginMode) {
     <app-login></app-login>
   } @else {
-    <app-register></app-register>
+    <app-register (registrationSuccess)="onRegistrationSuccess()"></app-register>
   }
 </div>

@@ -1,13 +1,15 @@
 @use 'styles/colors.scss' as colors;
 
 .sidebar {
-  width: 25vh;
-  height: 100%;
+  width: var(--sidebar-width, 25vh);
+  height: 100vh;
   background-color: colors.$dark;
   color: white;
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 10;
 }
 
 .sidebar-menu {
@@ -48,6 +50,16 @@
 .sidebar-footer {
   padding: 15px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-handle {
+  position: absolute;
+  width: 4px;
+  height: 100%;
+  right: 0;
+  cursor: col-resize;
+  background-color: darken(colors.$dark, 5%);
+  z-index: 100;
 }
 
 @media (max-width: 768px) {

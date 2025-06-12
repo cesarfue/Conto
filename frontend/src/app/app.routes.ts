@@ -30,7 +30,7 @@ export const routes: Routes = [
       import(
         './shared/components/join-or-create-organization/join-or-create-organization.component'
       ).then((m) => m.JoinOrCreateOrganizationComponent),
-    canActivate: [requiresAuthGuard],
+    canActivate: [requiresAuthGuard, requiresNoOrganizationGuard],
   },
   {
     path: 'auth',
